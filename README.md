@@ -35,12 +35,12 @@ This repository contains all project documentation required for Product Inceptio
 
 ## Project Artifacts
 
-| Artifact                   | Location                                                                 |
-| -------------------------- | ------------------------------------------------------------------------ |
-| Product Vision             | [docs/product-vision.md](docs/product-vision.md)                         |
-| Product Backlog            | [GitHub Projects] (https://github.com/users/dmitc072/projects/3/views/1) |
-| Backlog Ordering Rationale | [docs/backlog-rationale.md](docs/backlog-rationale.md)                   |
-| Definition of Ready        | [docs/definition-of-ready.md](docs/definition-of-ready.md)               |
+| Artifact                   | Location                                                         |
+| -------------------------- | ---------------------------------------------------------------- |
+| Product Vision             | [docs/product-vision.md](docs/product-vision.md)                 |
+| Product Backlog            | [GitHub Projects] (https://github.com/users/dmitc072/projects/3) |
+| Backlog Ordering Rationale | [docs/backlog-rationale.md](docs/backlog-rationale.md)           |
+| Definition of Ready        | [docs/definition-of-ready.md](docs/definition-of-ready.md)       |
 
 ---
 
@@ -98,11 +98,13 @@ OuttyDatingApp/
 ### First-time setup (run once after cloning)
 
 **1. Restore dependencies:**
+
 ```bash
 dotnet restore
 ```
 
 **2. Install Android SDK dependencies:**
+
 ```bash
 dotnet build src/Outty.Mobile -t:InstallAndroidDependencies -f net10.0-android \
   -p:AndroidSdkDirectory=$HOME/Library/Developer/Xamarin/android-sdk-macosx \
@@ -137,13 +139,13 @@ dotnet build src/Outty.Mobile -f net10.0-windows10.0.19041.0
 
 ### Common errors and fixes
 
-| Error | Fix |
-|---|---|
-| `XA5207: Could not find android.jar for API level 36` | Run the Android SDK install command above |
-| `Android SDK license agreements were not accepted` | Add `-p:AcceptAndroidSDKLicenses=true` to the build command |
-| `NETSDK1005: project.assets.json doesn't have a target` | Run `dotnet restore` first |
-| `Inadequate permissions` on workload install | Use `sudo dotnet workload install maui` |
-| Java version error (needs 17, has 11) | Run `brew install --cask temurin@17` |
+| Error                                                   | Fix                                                         |
+| ------------------------------------------------------- | ----------------------------------------------------------- |
+| `XA5207: Could not find android.jar for API level 36`   | Run the Android SDK install command above                   |
+| `Android SDK license agreements were not accepted`      | Add `-p:AcceptAndroidSDKLicenses=true` to the build command |
+| `NETSDK1005: project.assets.json doesn't have a target` | Run `dotnet restore` first                                  |
+| `Inadequate permissions` on workload install            | Use `sudo dotnet workload install maui`                     |
+| Java version error (needs 17, has 11)                   | Run `brew install --cask temurin@17`                        |
 
 ---
 
