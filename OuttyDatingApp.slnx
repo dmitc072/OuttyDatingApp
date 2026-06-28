@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Outty.Api/Outty.Api.csproj" />
+    <Project Path="src/Outty.Mobile/Outty.Mobile.csproj" />
+    <Project Path="src/Outty.Shared/Outty.Shared.csproj" />
+  </Folder>
+</Solution>

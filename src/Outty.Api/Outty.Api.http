@@ -1,0 +1,6 @@
+@Outty.Api_HostAddress = http://localhost:5157
+
+GET {{Outty.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
