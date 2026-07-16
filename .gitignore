@@ -55,3 +55,7 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+__azurite_db_blob__.json
+__azurite_db_blob_extent__.json
+__blobstorage__/
+*.csproj.user
