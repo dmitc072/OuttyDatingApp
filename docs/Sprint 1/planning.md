@@ -63,6 +63,8 @@ We will use this sprint's actual velocity to set a more accurate forecast for Sp
 | Implement ProfileService.cs — CreateProfile() saves to Azure SQL via API | Jazmin | 2h       | In Process |
 | Write unit tests for ProfileService.CreateProfile()                      | Duane  | 1h       | To Do      |
 
+> Design reference: [Profile screen](../design.md#profile)
+
 ### US-03 — Upload/Update Profile Photo (2 pts)
 
 | Task                                                            | Owner  | Estimate | Status     |

@@ -41,6 +41,7 @@ This repository contains all project documentation required for Product Inceptio
 | Product Backlog            | [GitHub Projects] (https://github.com/users/dmitc072/projects/3) |
 | Backlog Ordering Rationale | [docs/backlog-rationale.md](docs/backlog-rationale.md)           |
 | Definition of Ready        | [docs/definition-of-ready.md](docs/definition-of-ready.md)       |
+| Figma Designs               | [docs/design.md](docs/design.md)                                 |
 
 ---
 
