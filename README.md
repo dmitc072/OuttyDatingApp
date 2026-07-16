@@ -127,12 +127,15 @@ dotnet run --project src/Outty.Api
 
 ### Run the Mobile App
 
+> **Note:** The `dotnet run --project src/Outty.Mobile ...` commands below assume you're running from the **repo root**. If you've already `cd`'d into `src/Outty.Mobile`, drop `--project src/Outty.Mobile` and just run `dotnet run -f <framework>` — otherwise you'll get `The provided file path does not exist`.
+
 #### Option A — Physical Android Device
 
 1. On your phone go to **Settings → About Phone → tap Build Number 7 times** to enable Developer Mode
 2. Go to **Settings → Developer Options → enable USB Debugging**
 3. Plug your phone into your computer via USB
 4. Run:
+
 ```bash
 dotnet run --project src/Outty.Mobile -f net10.0-android
 ```
@@ -140,9 +143,13 @@ dotnet run --project src/Outty.Mobile -f net10.0-android
 #### Option B — Android Emulator
 
 1. Install [Android Studio](https://developer.android.com/studio) (free)
-2. Open Android Studio → **Virtual Device Manager → Create Device**
-3. Pick a device and a system image, then start the emulator
+2. Open Android Studio. On the **Welcome** screen, click **More Actions → Virtual Device Manager**:
+
+   ![Android Studio welcome screen with More Actions menu open and Virtual Device Manager highlighted](image.png)
+
+3. Click **Create Device**, pick a device and a system image, then start the emulator
 4. Once the emulator is running:
+
 ```bash
 dotnet run --project src/Outty.Mobile -f net10.0-android
 ```
