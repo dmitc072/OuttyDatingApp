@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="Outty.Mobile.Views.CreateProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Create Profile"
+    BackgroundColor="#F4F1E8">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="24"
+            Spacing="18">
+
+            <!-- Page header -->
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="34"
+                Text="Create Your Profile"
+                TextColor="#183D2B" />
+
+            <Label
+                FontSize="15"
+                Text="Tell other adventurers who you are and what you enjoy."
+                TextColor="#667267" />
+
+            <!-- Profile photos -->
+
+            <Grid
+                Margin="0,8,0,0"
+                ColumnDefinitions="*,Auto">
+
+                <VerticalStackLayout Spacing="3">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        Text="Profile Photos"
+                        TextColor="#183D2B" />
+
+                    <Label
+                        FontSize="13"
+                        Text="Add at least one photo. You may upload up to six."
+                        TextColor="#667267" />
+                </VerticalStackLayout>
+
+                <Label
+                    x:Name="PhotoCountLabel"
+                    Grid.Column="1"
+                    FontAttributes="Bold"
+                    Text="0 / 6"
+                    TextColor="#2F6B4F"
+                    VerticalOptions="Center" />
+
+            </Grid>
+
+            <Border
+                Padding="15"
+                BackgroundColor="#E4EAE3"
+                Stroke="#C6D0C8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <CollectionView
+                        x:Name="PhotoCollectionView"
+                        HeightRequest="180"
+                        HorizontalScrollBarVisibility="Never"
+                        ItemsSource="{Binding Photos}"
+                        ItemsLayout="HorizontalList"
+                        SelectionMode="None">
+
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout
+                                HorizontalOptions="Center"
+                                Spacing="8"
+                                VerticalOptions="Center">
+
+                                <Label
+                                    FontSize="42"
+                                    HorizontalTextAlignment="Center"
+                                    Text="📷" />
+
+                                <Label
+                                    FontAttributes="Bold"
+                                    HorizontalTextAlignment="Center"
+                                    Text="No photos added"
+                                    TextColor="#34463A" />
+
+                                <Label
+                                    FontSize="12"
+                                    HorizontalTextAlignment="Center"
+                                    Text="Choose photos from your device."
+                                    TextColor="#667267" />
+
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid
+                                    Margin="0,0,12,0"
+                                    HeightRequest="160"
+                                    WidthRequest="125">
+
+                                    <Border
+                                        BackgroundColor="White"
+                                        Stroke="#C6D0C8"
+                                        StrokeThickness="1">
+
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14" />
+                                        </Border.StrokeShape>
+
+                                        <Image
+                                            Aspect="AspectFill"
+                                            Source="{Binding ImageSource}" />
+
+                                    </Border>
+
+                                    <Button
+                                        Margin="0,-6,-6,0"
+                                        Padding="0"
+                                        BackgroundColor="#B3261E"
+                                        Clicked="OnRemovePhotoClicked"
+                                        CommandParameter="{Binding .}"
+                                        CornerRadius="16"
+                                        FontAttributes="Bold"
+                                        FontSize="13"
+                                        HeightRequest="32"
+                                        HorizontalOptions="End"
+                                        Text="✕"
+                                        TextColor="White"
+                                        VerticalOptions="Start"
+                                        WidthRequest="32" />
+
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Grid
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="12">
+
+                        <Button
+                            BackgroundColor="#2F6B4F"
+                            Clicked="OnChoosePhotosClicked"
+                            CornerRadius="12"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            Text="Choose Photos"
+                            TextColor="White" />
+
+                        <Button
+                            Grid.Column="1"
+                            BackgroundColor="White"
+                            BorderColor="#2F6B4F"
+                            BorderWidth="1"
+                            Clicked="OnTakePhotoClicked"
+                            CornerRadius="12"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            Text="Take Photo"
+                            TextColor="#2F6B4F" />
+
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Display name -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="Display Name"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Entry
+                    x:Name="NameEntry"
+                    Margin="12,4"
+                    Placeholder="Enter your display name"
+                    PlaceholderColor="#727B74"
+                    TextColor="#222222" />
+
+            </Border>
+
+            <!-- Date of birth -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="Date of Birth"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <DatePicker
+                    x:Name="BirthDatePicker"
+                    DateSelected="OnBirthDateSelected"
+                    Margin="12,4"
+                    TextColor="#222222" />
+
+            </Border>
+
+            <Label
+                x:Name="AgeLabel"
+                FontSize="13"
+                Text="You must be at least 18 years old."
+                TextColor="#667267" />
+
+            <!-- Location -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="Location"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Entry
+                    x:Name="LocationEntry"
+                    Margin="12,4"
+                    Placeholder="City, State"
+                    PlaceholderColor="#727B74"
+                    TextColor="#222222" />
+
+            </Border>
+
+            <!-- Pronouns -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="Pronouns"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Picker
+                    x:Name="PronounsPicker"
+                    Margin="12,4"
+                    TextColor="#222222"
+                    Title="Select pronouns"
+                    TitleColor="#727B74">
+
+                    <Picker.Items>
+                        <x:String>She/Her</x:String>
+                        <x:String>He/Him</x:String>
+                        <x:String>They/Them</x:String>
+                        <x:String>She/They</x:String>
+                        <x:String>He/They</x:String>
+                        <x:String>Prefer not to say</x:String>
+                    </Picker.Items>
+
+                </Picker>
+
+            </Border>
+
+            <!-- Bio -->
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label
+                    FontAttributes="Bold"
+                    Text="Bio"
+                    TextColor="#183D2B" />
+
+                <Label
+                    x:Name="BioCountLabel"
+                    Grid.Column="1"
+                    FontSize="12"
+                    Text="0 / 300"
+                    TextColor="#667267" />
+            </Grid>
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Editor
+                    x:Name="BioEditor"
+                    Margin="12"
+                    AutoSize="TextChanges"
+                    BackgroundColor="Transparent"
+                    HeightRequest="120"
+                    MaxLength="300"
+                    Placeholder="Share your personality and favorite adventures..."
+                    PlaceholderColor="#727B74"
+                    TextChanged="OnBioTextChanged"
+                    TextColor="#222222" />
+
+            </Border>
+
+            <!-- Experience level -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="Experience Level"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Picker
+                    x:Name="ExperiencePicker"
+                    Margin="12,4"
+                    TextColor="#222222"
+                    Title="Select experience level"
+                    TitleColor="#727B74">
+
+                    <Picker.Items>
+                        <x:String>Beginner</x:String>
+                        <x:String>Intermediate</x:String>
+                        <x:String>Advanced</x:String>
+                    </Picker.Items>
+
+                </Picker>
+
+            </Border>
+
+            <!-- Travel distance -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="Preferred Adventure Distance"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Picker
+                    x:Name="DistancePicker"
+                    Margin="12,4"
+                    TextColor="#222222"
+                    Title="Select preferred distance"
+                    TitleColor="#727B74">
+
+                    <Picker.Items>
+                        <x:String>Within 10 miles</x:String>
+                        <x:String>Within 25 miles</x:String>
+                        <x:String>Within 50 miles</x:String>
+                        <x:String>Within 100 miles</x:String>
+                        <x:String>Anywhere</x:String>
+                    </Picker.Items>
+
+                </Picker>
+
+            </Border>
+
+            <!-- Looking for -->
+
+            <Label
+                FontAttributes="Bold"
+                Text="What Are You Looking For?"
+                TextColor="#183D2B" />
+
+            <Border
+                Padding="14"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+
+                    <Grid ColumnDefinitions="Auto,*">
+                        <CheckBox x:Name="FriendsCheckBox" />
+                        <Label
+                            Grid.Column="1"
+                            Text="Friends"
+                            TextColor="#222222"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*">
+                        <CheckBox x:Name="PartnersCheckBox" />
+                        <Label
+                            Grid.Column="1"
+                            Text="Adventure Partners"
+                            TextColor="#222222"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*">
+                        <CheckBox x:Name="DatingCheckBox" />
+                        <Label
+                            Grid.Column="1"
+                            Text="Dating"
+                            TextColor="#222222"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*">
+                        <CheckBox x:Name="GroupsCheckBox" />
+                        <Label
+                            Grid.Column="1"
+                            Text="Group Activities"
+                            TextColor="#222222"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Outdoor interests -->
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="20"
+                Text="Outdoor Interests"
+                TextColor="#183D2B" />
+
+            <Border
+                Padding="14"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Grid
+                    ColumnDefinitions="Auto,*"
+                    RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                    RowSpacing="9">
+
+                    <CheckBox x:Name="HikingCheckBox" />
+
+                    <Label
+                        Grid.Column="1"
+                        Text="🥾 Hiking"
+                        TextColor="#222222"
+                        VerticalOptions="Center" />
+
+                    <CheckBox
+                        x:Name="CampingCheckBox"
+                        Grid.Row="1" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Text="🏕 Camping"
+                        TextColor="#222222"
+                        VerticalOptions="Center" />
+
+                    <CheckBox
+                        x:Name="KayakingCheckBox"
+                        Grid.Row="2" />
+
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Text="🚣 Kayaking"
+                        TextColor="#222222"
+                        VerticalOptions="Center" />
+
+                    <CheckBox
+                        x:Name="ClimbingCheckBox"
+                        Grid.Row="3" />
+
+                    <Label
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Text="🧗 Rock Climbing"
+                        TextColor="#222222"
+                        VerticalOptions="Center" />
+
+                    <CheckBox
+                        x:Name="CyclingCheckBox"
+                        Grid.Row="4" />
+
+                    <Label
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Text="🚲 Cycling"
+                        TextColor="#222222"
+                        VerticalOptions="Center" />
+
+                    <CheckBox
+                        x:Name="TravelCheckBox"
+                        Grid.Row="5" />
+
+                    <Label
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        Text="🗺 Travel and Road Trips"
+                        TextColor="#222222"
+                        VerticalOptions="Center" />
+
+                </Grid>
+            </Border>
+
+            <!-- Error message -->
+
+            <Label
+                x:Name="ErrorLabel"
+                FontAttributes="Bold"
+                IsVisible="False"
+                TextColor="#B3261E" />
+
+            <!-- Submit button -->
+
+            <Button
+                Margin="0,16,0,30"
+                BackgroundColor="#2F6B4F"
+                Clicked="OnSaveProfileClicked"
+                CornerRadius="14"
+                FontAttributes="Bold"
+                FontSize="18"
+                HeightRequest="58"
+                Text="Create Profile"
+                TextColor="White" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

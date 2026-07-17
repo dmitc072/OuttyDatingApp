@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="Outty.Mobile.Views.DeleteAccountPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Delete Account"
+    BackgroundColor="#F4F1E8">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="24"
+            Spacing="20">
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="32"
+                Text="Delete Account"
+                TextColor="#7A1F1F" />
+
+            <Label
+                FontSize="15"
+                Text="This action permanently removes your Outty account."
+                TextColor="#667267" />
+
+            <Border
+                Padding="20"
+                BackgroundColor="#FFF3F3"
+                Stroke="#D99A9A"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <Label
+                        FontSize="42"
+                        HorizontalTextAlignment="Center"
+                        Text="⚠️" />
+
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="21"
+                        HorizontalTextAlignment="Center"
+                        Text="Deleting your account is permanent"
+                        TextColor="#7A1F1F" />
+
+                    <Label
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"
+                        Text="Once your account is deleted, it cannot be restored."
+                        TextColor="#5C3434" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="The following information will be removed:"
+                TextColor="#183D2B" />
+
+            <Border
+                Padding="18"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="12">
+
+                    <Label
+                        Text="• Your profile information"
+                        TextColor="#222222" />
+
+                    <Label
+                        Text="• Uploaded profile photos"
+                        TextColor="#222222" />
+
+                    <Label
+                        Text="• Your bio and preferences"
+                        TextColor="#222222" />
+
+                    <Label
+                        Text="• Outdoor interests"
+                        TextColor="#222222" />
+
+                    <Label
+                        Text="• Matches and messages"
+                        TextColor="#222222" />
+
+                    <Label
+                        Text="• Saved account settings"
+                        TextColor="#222222" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label
+                FontAttributes="Bold"
+                Text="Type DELETE to confirm"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <Entry
+                    x:Name="ConfirmationEntry"
+                    Margin="12,4"
+                    Placeholder="DELETE"
+                    PlaceholderColor="#888888"
+                    TextChanged="OnConfirmationTextChanged"
+                    TextColor="#222222" />
+
+            </Border>
+
+            <Label
+                x:Name="ErrorLabel"
+                FontAttributes="Bold"
+                IsVisible="False"
+                TextColor="#B3261E" />
+
+            <Button
+                x:Name="DeleteAccountButton"
+                BackgroundColor="#B3261E"
+                Clicked="OnDeleteAccountClicked"
+                CornerRadius="14"
+                FontAttributes="Bold"
+                FontSize="17"
+                HeightRequest="56"
+                IsEnabled="False"
+                Opacity="0.5"
+                Text="Delete My Account"
+                TextColor="White" />
+
+            <Button
+                BackgroundColor="Transparent"
+                BorderColor="#2F6B4F"
+                BorderWidth="1"
+                Clicked="OnCancelClicked"
+                CornerRadius="14"
+                FontAttributes="Bold"
+                HeightRequest="54"
+                Text="Cancel"
+                TextColor="#2F6B4F" />
+
+            <Label
+                Margin="0,4,0,20"
+                FontSize="12"
+                HorizontalTextAlignment="Center"
+                Text="For this class version, deletion clears locally stored Outty data and returns the user to the login page."
+                TextColor="#667267" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

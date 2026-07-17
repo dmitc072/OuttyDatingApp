@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="Outty.Mobile.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Settings"
+    BackgroundColor="#F4F1E8">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="24"
+            Spacing="20">
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="32"
+                Text="Settings"
+                TextColor="#183D2B" />
+
+            <Label
+                FontSize="15"
+                Text="Manage your Outty account and preferences."
+                TextColor="#667267" />
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="Account"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="0">
+
+                    <Grid
+                        Padding="18"
+                        ColumnDefinitions="*,Auto">
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label
+                                FontAttributes="Bold"
+                                Text="Profile"
+                                TextColor="#222222" />
+
+                            <Label
+                                FontSize="12"
+                                Text="View your public profile"
+                                TextColor="#667267" />
+                        </VerticalStackLayout>
+
+                        <Button
+                            Grid.Column="1"
+                            Padding="12,6"
+                            BackgroundColor="Transparent"
+                            Clicked="OnProfileClicked"
+                            Text="Open"
+                            TextColor="#2F6B4F" />
+
+                    </Grid>
+
+                    <BoxView
+                        Margin="18,0"
+                        HeightRequest="1"
+                        Color="#E4E4E4" />
+
+                    <Grid
+                        Padding="18"
+                        ColumnDefinitions="*,Auto">
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label
+                                FontAttributes="Bold"
+                                Text="Edit Profile"
+                                TextColor="#222222" />
+
+                            <Label
+                                FontSize="12"
+                                Text="Update profile information and photos"
+                                TextColor="#667267" />
+                        </VerticalStackLayout>
+
+                        <Button
+                            Grid.Column="1"
+                            Padding="12,6"
+                            BackgroundColor="Transparent"
+                            Clicked="OnEditProfileClicked"
+                            Text="Edit"
+                            TextColor="#2F6B4F" />
+
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="Preferences"
+                TextColor="#183D2B" />
+
+            <Border
+                Padding="18"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="18">
+
+                    <Grid ColumnDefinitions="*,Auto">
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label
+                                FontAttributes="Bold"
+                                Text="Notifications"
+                                TextColor="#222222" />
+
+                            <Label
+                                FontSize="12"
+                                Text="Receive match and message alerts"
+                                TextColor="#667267" />
+                        </VerticalStackLayout>
+
+                        <Switch
+                            x:Name="NotificationsSwitch"
+                            Grid.Column="1"
+                            Toggled="OnNotificationsToggled"
+                            VerticalOptions="Center" />
+
+                    </Grid>
+
+                    <BoxView
+                        HeightRequest="1"
+                        Color="#E4E4E4" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label
+                                FontAttributes="Bold"
+                                Text="Location Sharing"
+                                TextColor="#222222" />
+
+                            <Label
+                                FontSize="12"
+                                Text="Use location for nearby adventures"
+                                TextColor="#667267" />
+                        </VerticalStackLayout>
+
+                        <Switch
+                            x:Name="LocationSwitch"
+                            Grid.Column="1"
+                            Toggled="OnLocationToggled"
+                            VerticalOptions="Center" />
+
+                    </Grid>
+
+                    <BoxView
+                        HeightRequest="1"
+                        Color="#E4E4E4" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label
+                                FontAttributes="Bold"
+                                Text="Show Profile"
+                                TextColor="#222222" />
+
+                            <Label
+                                FontSize="12"
+                                Text="Allow other users to view your profile"
+                                TextColor="#667267" />
+                        </VerticalStackLayout>
+
+                        <Switch
+                            x:Name="ShowProfileSwitch"
+                            Grid.Column="1"
+                            Toggled="OnShowProfileToggled"
+                            VerticalOptions="Center" />
+
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="Support"
+                TextColor="#183D2B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="0">
+
+                    <Button
+                        BackgroundColor="Transparent"
+                        Clicked="OnPrivacyClicked"
+                        HorizontalOptions="Fill"
+                        Padding="18"
+                        Text="Privacy Information"
+                        TextColor="#222222" />
+
+                    <BoxView
+                        Margin="18,0"
+                        HeightRequest="1"
+                        Color="#E4E4E4" />
+
+                    <Button
+                        BackgroundColor="Transparent"
+                        Clicked="OnHelpClicked"
+                        HorizontalOptions="Fill"
+                        Padding="18"
+                        Text="Help and Support"
+                        TextColor="#222222" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="Danger Zone"
+                TextColor="#7A1F1F" />
+
+            <Border
+                Padding="18"
+                BackgroundColor="#FFF3F3"
+                Stroke="#D99A9A"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="12">
+
+                    <Label
+                        FontAttributes="Bold"
+                        Text="Delete Account"
+                        TextColor="#7A1F1F" />
+
+                    <Label
+                        FontSize="13"
+                        Text="Permanently delete your Outty account and locally stored profile information."
+                        TextColor="#5C3434" />
+
+                    <Button
+                        BackgroundColor="#B3261E"
+                        Clicked="OnDeleteAccountClicked"
+                        CornerRadius="12"
+                        FontAttributes="Bold"
+                        HeightRequest="50"
+                        Text="Delete My Account"
+                        TextColor="White" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Button
+                Margin="0,0,0,24"
+                BackgroundColor="Transparent"
+                BorderColor="#2F6B4F"
+                BorderWidth="1"
+                Clicked="OnBackClicked"
+                CornerRadius="14"
+                FontAttributes="Bold"
+                HeightRequest="54"
+                Text="Back"
+                TextColor="#2F6B4F" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
