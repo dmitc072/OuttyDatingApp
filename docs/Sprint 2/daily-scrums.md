@@ -19,9 +19,10 @@ Daily scrums held asynchronously via Discord every morning at 9:00 AM. Each memb
 ### Jazmin Johnson (Product Owner)
 
 **What did I do in the last 24 hours?**
+Create UI for the following pages: Login, Create Profile,  Home Page
 
-**What will I do in the next 24 hours?**
-
+**What will I do in the next 24-48 hours?**
+-Create UI for the following pages: Setting, Delete Account
 **Any impediments?**
 
 ---
@@ -51,6 +52,7 @@ Daily scrums held asynchronously via Discord every morning at 9:00 AM. Each memb
 ### Jazmin Johnson (Product Owner)
 
 **What did I do in the last 24 hours?**
+-Create UI for the following pages: Setting, Delete Account
 
 **What will I do in the next 24 hours?**
 
@@ -84,7 +86,11 @@ Daily scrums held asynchronously via Discord every morning at 9:00 AM. Each memb
 
 **What did I do in the last 24 hours?**
 
+
 **What will I do in the next 24 hours?**
+-Create UI for In-App Messaging and the Read Receipts features
+-Fix connections to the backend for storage
+-Make sure the photo pieces work in the android simulation
 
 **Any impediments?**
 
