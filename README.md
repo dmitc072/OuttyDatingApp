@@ -41,7 +41,7 @@ This repository contains all project documentation required for Product Inceptio
 | Product Backlog            | [GitHub Projects] (https://github.com/users/dmitc072/projects/3) |
 | Backlog Ordering Rationale | [docs/backlog-rationale.md](docs/backlog-rationale.md)           |
 | Definition of Ready        | [docs/definition-of-ready.md](docs/definition-of-ready.md)       |
-| Figma Designs               | [docs/design.md](docs/design.md)                                 |
+| Figma Designs              | [docs/design.md](docs/design.md)                                 |
 
 ---
 
@@ -128,7 +128,7 @@ dotnet run --project src/Outty.Api
 
 ### Run the Mobile App
 
-> **Note:** The `dotnet run --project src/Outty.Mobile ...` commands below assume you're running from the **repo root**. If you've already `cd`'d into `src/Outty.Mobile`, drop `--project src/Outty.Mobile` and just run `dotnet run -f <framework>` — otherwise you'll get `The provided file path does not exist`.
+> **Note:** The `dotnet run --project src/Outty.Mobile ...` commands below assume you're running from the **repo root**. If you've already `cd`'d into `src/Outty.Mobile`, drop `--project src/Outty.Mobile` and just run `dotnet run -f net10.0-android` — otherwise you'll get `The provided file path does not exist`.
 
 #### Option A — Physical Android Device
 

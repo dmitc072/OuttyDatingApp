@@ -36,7 +36,7 @@ Daily scrums held asynchronously via Discord every morning at 9:00 AM. Each memb
 
 ---
 
-## Daily Scrum — Day 4 | July 16, 2026
+## Daily Scrum — Day 4 | Ju 16, 2026
 
 ### Duane Mitchell (Scrum Master)
 
