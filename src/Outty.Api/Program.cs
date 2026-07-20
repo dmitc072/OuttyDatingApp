@@ -1,8 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Outty.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<OuttyDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OuttyDb")));
 
 var app = builder.Build();
 
@@ -32,6 +38,17 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.MapGet("/states", async (OuttyDbContext db) =>
+{
+    var states = await db.States
+        .OrderBy(s => s.Name)
+        .Select(s => new { s.Abbreviation, s.Name })
+        .ToListAsync();
+
+    return states;
+})
+.WithName("GetStates");
 
 app.Run();
 
