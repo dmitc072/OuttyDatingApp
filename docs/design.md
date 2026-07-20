@@ -25,7 +25,6 @@ Referenced by Sprint 1 US-02 (Create Profile).
 ## Partners
 
 Match notifications, partner avatars, conversation list, verified/badge system.
-Referenced by Sprint 2 US-12 (Match Notification).
 
 ![Partners](assets/FigmaDesign/Partners.png)
 

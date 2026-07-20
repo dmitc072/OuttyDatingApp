@@ -16,17 +16,19 @@
 
 Update this table daily as work is completed. Story points remaining = total committed minus points of completed stories.
 
-| Day   | Date   | Points Remaining | Notes                                                     |
-| ----- | ------ | ---------------- | --------------------------------------------------------- |
-| Day 1 | Jul 13 | 17               | Sprint start — environment + planning                     |
-| Day 2 | Jul 14 | 15               | US-08 Set Search Radius (2 pts) complete                  |
-| Day 3 | Jul 15 | 13               | US-09 Set Availability (2 pts) complete                   |
-| Day 4 | Jul 16 | 13               | In progress on US-10 Swipe Left/Right UI                  |
-| Day 5 | Jul 17 | 8                | US-10 (5 pts) complete — started US-11 Matching Algorithm |
-| Day 6 | Jul 18 | 3                | US-11 (5 pts) complete — started US-12 Match Notification |
-| Day 7 | Jul 19 | 0                | US-12 (3 pts) complete — sprint done                      |
+| Day   | Date   | Points Remaining | Notes                                                                 |
+| ----- | ------ | ---------------- | ---------------------------------------------------------------------- |
+| Day 1 | Jul 13 | 17               | Sprint start — Week 0 environment check, sprint planning               |
+| Day 2 | Jul 14 | 17               | Began US-12 database schema design                                     |
+| Day 3 | Jul 15 | 14               | US-12 Set up Database (3 pts) complete — migrations applied, connection verified |
+| Day 4 | Jul 16 | 14               | Started US-10 Swipe Left/Right UI (Figma design, SwipePage.xaml)       |
+| Day 5 | Jul 17 | 14               | Continued US-10; started US-11 Matching Algorithm design               |
+| Day 6 | Jul 18 | 14               | US-10 and US-11 still in progress; photo upload not working on Android emulator |
+| Day 7 | Jul 19 | 14               | Sprint end — US-08/US-09 not started, US-10/US-11 in progress; goal not met, carried into Sprint 3 |
 
 **Ideal burndown line:** 17 → 14.6 → 12.1 → 9.7 → 7.3 → 4.9 → 2.4 → 0
+
+**Actual burndown flattened at 14 pts** — only US-12 (3 of 17 committed pts) reached Done. See `sprint-review-retro.md` for the full outcome and retrospective.
 
 ---
 
