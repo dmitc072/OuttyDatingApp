@@ -1,0 +1,132 @@
+namespace Outty.Mobile.Views;
+
+public partial class ProfilePage : ContentPage
+{
+    public ProfilePage()
+    {
+        InitializeComponent();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        LoadProfileInformation();
+    }
+
+    private void LoadProfileInformation()
+    {
+        ProfileNameLabel.Text =
+            Preferences.Default.Get(
+                "ProfileName",
+                "Outty User");
+
+        ProfileLocationLabel.Text =
+            Preferences.Default.Get(
+                "ProfileLocation",
+                "Location not added");
+
+        ProfilePronounsLabel.Text =
+            Preferences.Default.Get(
+                "ProfilePronouns",
+                "Pronouns not added");
+
+        ProfileBioLabel.Text =
+            Preferences.Default.Get(
+                "ProfileBio",
+                "No bio has been added yet.");
+
+        ExperienceLabel.Text =
+            Preferences.Default.Get(
+                "ProfileExperience",
+                "Not selected");
+
+        DistanceLabel.Text =
+            Preferences.Default.Get(
+                "ProfileDistance",
+                "Not selected");
+
+        LookingForLabel.Text =
+            Preferences.Default.Get(
+                "ProfileLookingFor",
+                "Not selected");
+
+        InterestsLabel.Text =
+            Preferences.Default.Get(
+                "ProfileInterests",
+                "No interests selected.");
+
+        var primaryPhotoPath =
+            Preferences.Default.Get(
+                "PrimaryProfilePhoto",
+                string.Empty);
+
+        if (!string.IsNullOrWhiteSpace(primaryPhotoPath) &&
+            File.Exists(primaryPhotoPath))
+        {
+            ProfileImage.Source =
+                ImageSource.FromFile(primaryPhotoPath);
+        }
+        else
+        {
+            ProfileImage.Source = null;
+
+            ProfileImage.BackgroundColor =
+                Color.FromArgb("#E4EAE3");
+        }
+    }
+
+    private async void OnEditProfileClicked(
+        object? sender,
+        EventArgs e)
+    {
+        try
+        {
+            await Shell.Current.GoToAsync(
+                "//CreateProfilePage");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Navigation Error",
+                $"Unable to open the profile editor: {ex.Message}",
+                "OK");
+        }
+    }
+
+    private async void OnSettingsClicked(
+        object? sender,
+        EventArgs e)
+    {
+        try
+        {
+            await Shell.Current.GoToAsync(
+                "//SettingsPage");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Navigation Error",
+                $"Unable to open settings: {ex.Message}",
+                "OK");
+        }
+    }
+
+    private async void OnHomeClicked(
+        object? sender,
+        EventArgs e)
+    {
+        try
+        {
+            await Shell.Current.GoToAsync(
+                "//HomePage");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Navigation Error",
+                $"Unable to return home: {ex.Message}",
+                "OK");
+        }
+    }
+}

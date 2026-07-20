@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <Shell
     x:Class="Outty.Mobile.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Outty.Mobile"
-    Title="Outty.Mobile">
+    xmlns:views="clr-namespace:Outty.Mobile.Views"
+    FlyoutBehavior="Disabled">
 
     <ShellContent
+        Route="LoginPage"
+        Title="Login"
+        ContentTemplate="{DataTemplate views:LoginPage}" />
+
+    <ShellContent
+        Route="HomePage"
         Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        ContentTemplate="{DataTemplate views:HomePage}" />
 
 </Shell>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="Outty.Mobile.Views.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Profile"
+    BackgroundColor="#F4F1E8">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="24"
+            Spacing="20">
+
+            <Grid ColumnDefinitions="*,Auto">
+
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="32"
+                    Text="My Profile"
+                    TextColor="#183D2B" />
+
+                <Button
+                    Grid.Column="1"
+                    Padding="14,8"
+                    BackgroundColor="Transparent"
+                    BorderColor="#2F6B4F"
+                    BorderWidth="1"
+                    Clicked="OnSettingsClicked"
+                    CornerRadius="12"
+                    Text="Settings"
+                    TextColor="#2F6B4F" />
+
+            </Grid>
+
+            <Border
+                Padding="20"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout
+                    HorizontalOptions="Center"
+                    Spacing="12">
+
+                    <Border
+                        HeightRequest="140"
+                        WidthRequest="140"
+                        BackgroundColor="#E4EAE3"
+                        Stroke="#C6D0C8"
+                        StrokeThickness="1">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="70" />
+                        </Border.StrokeShape>
+
+                        <Image
+                            x:Name="ProfileImage"
+                            Aspect="AspectFill" />
+
+                    </Border>
+
+                    <Label
+                        x:Name="ProfileNameLabel"
+                        FontAttributes="Bold"
+                        FontSize="26"
+                        HorizontalTextAlignment="Center"
+                        Text="Outty User"
+                        TextColor="#183D2B" />
+
+                    <Label
+                        x:Name="ProfileLocationLabel"
+                        FontSize="15"
+                        HorizontalTextAlignment="Center"
+                        Text="Location not added"
+                        TextColor="#667267" />
+
+                    <Label
+                        x:Name="ProfilePronounsLabel"
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"
+                        Text="Pronouns not added"
+                        TextColor="#667267" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                Padding="18"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="19"
+                        Text="About Me"
+                        TextColor="#183D2B" />
+
+                    <Label
+                        x:Name="ProfileBioLabel"
+                        LineBreakMode="WordWrap"
+                        Text="No bio has been added yet."
+                        TextColor="#222222" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                Padding="18"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="19"
+                        Text="Adventure Preferences"
+                        TextColor="#183D2B" />
+
+                    <Label
+                        Text="Experience Level"
+                        TextColor="#667267" />
+
+                    <Label
+                        x:Name="ExperienceLabel"
+                        FontAttributes="Bold"
+                        Text="Not selected"
+                        TextColor="#222222" />
+
+                    <Label
+                        Margin="0,8,0,0"
+                        Text="Preferred Distance"
+                        TextColor="#667267" />
+
+                    <Label
+                        x:Name="DistanceLabel"
+                        FontAttributes="Bold"
+                        Text="Not selected"
+                        TextColor="#222222" />
+
+                    <Label
+                        Margin="0,8,0,0"
+                        Text="Looking For"
+                        TextColor="#667267" />
+
+                    <Label
+                        x:Name="LookingForLabel"
+                        FontAttributes="Bold"
+                        LineBreakMode="WordWrap"
+                        Text="Not selected"
+                        TextColor="#222222" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                Padding="18"
+                BackgroundColor="White"
+                Stroke="#D7DDD8"
+                StrokeThickness="1">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="19"
+                        Text="Outdoor Interests"
+                        TextColor="#183D2B" />
+
+                    <Label
+                        x:Name="InterestsLabel"
+                        LineBreakMode="WordWrap"
+                        Text="No interests selected."
+                        TextColor="#222222" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Button
+                BackgroundColor="#2F6B4F"
+                Clicked="OnEditProfileClicked"
+                CornerRadius="14"
+                FontAttributes="Bold"
+                FontSize="17"
+                HeightRequest="56"
+                Text="Edit Profile"
+                TextColor="White" />
+
+            <Button
+                Margin="0,0,0,24"
+                BackgroundColor="Transparent"
+                BorderColor="#2F6B4F"
+                BorderWidth="1"
+                Clicked="OnHomeClicked"
+                CornerRadius="14"
+                FontAttributes="Bold"
+                HeightRequest="54"
+                Text="Back to Home"
+                TextColor="#2F6B4F" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
