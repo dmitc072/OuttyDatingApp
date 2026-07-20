@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Outty.Mobile.Models;
+using Outty.Shared.Utilities;
 
 namespace Outty.Mobile.Views;
 
@@ -220,13 +221,14 @@ public partial class CreateProfilePage : ContentPage
         var birthDate =
             BirthDatePicker.Date ?? DateTime.Today;
 
-        var age = CalculateAge(birthDate);
+        var age = AgeCalculator.CalculateAge(birthDate, DateTime.Today);
+        var isEligible = AgeCalculator.IsAtLeast18(birthDate, DateTime.Today);
 
-        AgeLabel.Text = age >= 18
+        AgeLabel.Text = isEligible
             ? $"Age: {age}"
             : "You must be at least 18 years old.";
 
-        AgeLabel.TextColor = age >= 18
+        AgeLabel.TextColor = isEligible
             ? Color.FromArgb("#667267")
             : Color.FromArgb("#B3261E");
     }
@@ -256,7 +258,7 @@ public partial class CreateProfilePage : ContentPage
         var birthDate =
             BirthDatePicker.Date ?? DateTime.Today;
 
-        if (CalculateAge(birthDate) < 18)
+        if (!AgeCalculator.IsAtLeast18(birthDate, DateTime.Today))
         {
             ShowError(
                 "You must be at least 18 years old.");
@@ -449,19 +451,6 @@ public partial class CreateProfilePage : ContentPage
                ClimbingCheckBox.IsChecked ||
                CyclingCheckBox.IsChecked ||
                TravelCheckBox.IsChecked;
-    }
-
-    private static int CalculateAge(DateTime birthDate)
-    {
-        var today = DateTime.Today;
-        var age = today.Year - birthDate.Year;
-
-        if (birthDate.Date > today.AddYears(-age))
-        {
-            age--;
-        }
-
-        return age;
     }
 
     private void UpdatePhotoCount()

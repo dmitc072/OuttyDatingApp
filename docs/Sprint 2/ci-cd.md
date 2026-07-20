@@ -28,7 +28,7 @@ We chose GitHub Actions as our CI tool for the following reasons:
 
 **File location in repo:** `.github/workflows/main.yml`
 
-> The workflow restores/builds the full `OuttyDatingApp.slnx`, including `Outty.Mobile` (.NET MAUI, Android target). Since `ubuntu-latest` doesn't ship the MAUI SDK workload by default, a dedicated step installs it (`dotnet workload install maui-android`) before restore. This adds a few minutes to every run — worth it once Mobile code is actively changing; `dotnet test` still only targets `Outty.Api` since that's the only project with tests.
+> The workflow restores/builds the full `OuttyDatingApp.slnx`, including `Outty.Mobile` (.NET MAUI, Android target). Since `ubuntu-latest` doesn't ship the MAUI SDK workload by default, a dedicated step installs it (`dotnet workload install maui-android`) before restore. This adds a few minutes to every run — worth it once Mobile code is actively changing; `dotnet test` targets `tests/Outty.Shared.Tests`, the project holding the test suite (see `tests.md`).
 
 ```yaml
 name: Outty CI
@@ -62,7 +62,7 @@ jobs:
         run: dotnet build OuttyDatingApp.slnx --no-restore --configuration Release
 
       - name: Run all tests
-        run: dotnet test src/Outty.Api/Outty.Api.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test tests/Outty.Shared.Tests/Outty.Shared.Tests.csproj --no-build --configuration Release --verbosity normal
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

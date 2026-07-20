@@ -29,7 +29,7 @@ jobs:
         run: dotnet build OuttyDatingApp.slnx --no-restore --configuration Release
 
       - name: Run all tests
-        run: dotnet test src/Outty.Api/Outty.Api.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test tests/Outty.Shared.Tests/Outty.Shared.Tests.csproj --no-build --configuration Release --verbosity normal
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
