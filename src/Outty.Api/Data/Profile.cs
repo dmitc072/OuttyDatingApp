@@ -29,6 +29,8 @@ public partial class Profile
 
     public DateTime UpdatedAtUtc { get; set; }
 
+    public int SearchRadiusMiles { get; set; }
+
     public virtual ICollection<ProfileInterest> ProfileInterests { get; set; } = new List<ProfileInterest>();
 
     public virtual ICollection<ProfilePhoto> ProfilePhotos { get; set; } = new List<ProfilePhoto>();

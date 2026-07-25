@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Outty.Api.Data;
 using Outty.Api.Services;
+using Outty.Shared.Utilities;
 using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,5 +47,23 @@ app.MapGet("/matches/candidates/{profileId:int}", async (int profileId, Matching
 })
 .WithName("GetMatchCandidates");
 
+app.MapPut("/profiles/{profileId:int}/search-radius", async (int profileId, SearchRadiusRequest request, OuttyDbContext db) =>
+{
+    var profile = await db.Profiles.FindAsync(profileId);
+    if (profile is null)
+    {
+        return Results.NotFound();
+    }
+
+    profile.SearchRadiusMiles = SearchRadiusValidator.Normalize(request.Miles);
+    profile.UpdatedAtUtc = DateTime.UtcNow;
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { profile.Id, profile.SearchRadiusMiles });
+})
+.WithName("SetSearchRadius");
+
 app.Run();
+
+record SearchRadiusRequest(int? Miles);
 

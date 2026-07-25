@@ -36,6 +36,8 @@ CREATE TABLE dbo.Profiles (
     Pronouns            NVARCHAR(30)   NULL,
     Bio                 NVARCHAR(300)  NULL,
     PreferredDistance   NVARCHAR(30)   NOT NULL,
+    SearchRadiusMiles   INT            NOT NULL DEFAULT 25
+        CONSTRAINT CK_Profiles_SearchRadiusMiles CHECK (SearchRadiusMiles BETWEEN 5 AND 100),
     CreatedAtUtc        DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME(),
     UpdatedAtUtc        DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME()
 );

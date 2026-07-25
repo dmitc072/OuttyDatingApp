@@ -71,6 +71,7 @@ public partial class OuttyDbContext : DbContext
             entity.Property(e => e.DisplayName).HasMaxLength(100);
             entity.Property(e => e.PreferredDistance).HasMaxLength(30);
             entity.Property(e => e.Pronouns).HasMaxLength(30);
+            entity.Property(e => e.SearchRadiusMiles).HasDefaultValue(25);
             entity.Property(e => e.State)
                 .HasMaxLength(2)
                 .IsUnicode(false)
