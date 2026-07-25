@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Outty.Api.Data;
+using Outty.Api.Services;
 using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<OuttyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OuttyDb")));
+
+builder.Services.AddScoped<MatchingService>();
 
 var app = builder.Build();
 
@@ -36,6 +39,12 @@ app.MapGet("/states", async (OuttyDbContext db) =>
 })
 .WithName("GetStates");
 
-app.Run();
+app.MapGet("/matches/candidates/{profileId:int}", async (int profileId, MatchingService matchingService) =>
+{
+    var candidates = await matchingService.GetCandidatesAsync(profileId);
+    return candidates;
+})
+.WithName("GetMatchCandidates");
 
+app.Run();
 
