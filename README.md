@@ -2,13 +2,14 @@
 
 **Course:** SWE 6733 – Emerging Software Engineering Processes
 
-Outty is a mobile application that connects people interested in outdoor activities based on shared interests, experience level, and location. The goal is to make it easier for users to find compatible adventure partners for activities such as hiking, kayaking, climbing, and backpacking.
+Outty is a cross-platform mobile application that helps people find outdoor adventure partners based on shared interests, experience level, and location. The application allows users to create profiles, discover potential matches, and connect with others who enjoy activities such as hiking, kayaking, climbing, backpacking, and more.
 
 ---
 
 ## Repository
 
-This repository contains all project documentation required for Product Inception and Planning, including the Product Vision, Product Backlog, Backlog Ordering Rationale, and Definition of Ready.
+- **Source Code:** https://github.com/dmitc072/OuttyDatingApp
+- **GitHub Project Board:** https://github.com/users/dmitc072/projects/3
 
 ---
 
@@ -35,13 +36,14 @@ This repository contains all project documentation required for Product Inceptio
 
 ## Project Artifacts
 
-| Artifact                   | Location                                                         |
-| -------------------------- | ---------------------------------------------------------------- |
-| Product Vision             | [docs/product-vision.md](docs/product-vision.md)                 |
-| Product Backlog            | [GitHub Projects] (https://github.com/users/dmitc072/projects/3) |
-| Backlog Ordering Rationale | [docs/backlog-rationale.md](docs/backlog-rationale.md)           |
-| Definition of Ready        | [docs/definition-of-ready.md](docs/definition-of-ready.md)       |
-| Figma Designs              | [docs/design.md](docs/design.md)                                 |
+| Artifact                   | Location                                                        |
+| -------------------------- | --------------------------------------------------------------- |
+| Product Vision             | [docs/product-vision.md](docs/product-vision.md)                |
+| Product Backlog            | [GitHub Projects](https://github.com/users/dmitc072/projects/3) |
+| Backlog Ordering Rationale | [docs/backlog-rationale.md](docs/backlog-rationale.md)          |
+| Definition of Ready        | [docs/definition-of-ready.md](docs/definition-of-ready.md)      |
+| Sprint Documentation       | [docs](docs/)                                                   |
+| UI Designs                 | [docs/design.md](docs/design.md)                                |
 
 ---
 
@@ -49,31 +51,15 @@ This repository contains all project documentation required for Product Inceptio
 
 ```
 OuttyDatingApp/
-├── Outty.sln
+├── docs/                  # Project documentation
 ├── src/
-│   ├── Outty.Mobile/               # .NET MAUI app (iOS & Android)
-│   │   ├── MauiProgram.cs
-│   │   ├── MainPage.xaml
-│   │   ├── AppShell.xaml
-│   │   └── Platforms/
-│   │       ├── Android/
-│   │       ├── iOS/
-│   │       ├── MacCatalyst/
-│   │       └── Windows/
-│   ├── Outty.Api/                  # ASP.NET Core Web API
-│   │   └── Program.cs
-│   └── Outty.Shared/               # Shared models & enums
-│       ├── Models/
-│       │   ├── User.cs
-│       │   ├── Match.cs
-│       │   └── Activity.cs
-│       └── Enums/
-│           └── ActivityType.cs
-├── docs/
-├── design/
+│   ├── Outty.Mobile/      # .NET MAUI mobile application
+│   ├── Outty.Api/         # ASP.NET Core Web API
+│   └── Outty.Shared/      # Shared models and classes
 ├── sprint-1/
 ├── sprint-2/
-└── sprint-3/
+├── sprint-3/
+└── Outty.sln
 ```
 
 ---
@@ -82,80 +68,48 @@ OuttyDatingApp/
 
 ### Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- .NET MAUI workload (run once per machine):
-  ```bash
-  sudo dotnet workload install maui
-  ```
-- **Java 17** (required for Android builds):
-  ```bash
-  brew install --cask temurin@17
-  ```
+- .NET 10 SDK
+- .NET MAUI workload
+- Java 17 (Android development)
+- Android SDK (Android development)
 
-> **Note:** iOS builds require a Mac with Xcode installed. This project targets Android and Windows only to keep the team unblocked.
+For detailed installation instructions, emulator setup, and troubleshooting, see the [Developer Setup Guide](docs/setup.md).
 
 ---
 
-### First-time setup (run once after cloning)
+## Build
 
-**1. Restore dependencies:**
+Restore project dependencies:
 
 ```bash
 dotnet restore
 ```
 
-**2. Install Android SDK dependencies:**
-
-```bash
-dotnet build src/Outty.Mobile -t:InstallAndroidDependencies -f net10.0-android \
-  -p:AndroidSdkDirectory=$HOME/Library/Developer/Xamarin/android-sdk-macosx \
-  -p:AcceptAndroidSDKLicenses=true
-```
-
----
-
-### Build the solution
+Build the solution:
 
 ```bash
 dotnet build
 ```
 
-### Run the API
+---
+
+## Run the API
 
 ```bash
 dotnet run --project src/Outty.Api
 ```
 
-### Run the Mobile App
+---
 
-> **Note:** The `dotnet run --project src/Outty.Mobile ...` commands below assume you're running from the **repo root**. If you've already `cd`'d into `src/Outty.Mobile`, drop `--project src/Outty.Mobile` and just run `dotnet run -f net10.0-android` — otherwise you'll get `The provided file path does not exist`.
+## Run the Mobile App
 
-#### Option A — Physical Android Device
-
-1. On your phone go to **Settings → About Phone → tap Build Number 7 times** to enable Developer Mode
-2. Go to **Settings → Developer Options → enable USB Debugging**
-3. Plug your phone into your computer via USB
-4. Run:
+### Android
 
 ```bash
 dotnet run --project src/Outty.Mobile -f net10.0-android
 ```
 
-#### Option B — Android Emulator
-
-1. Install [Android Studio](https://developer.android.com/studio) (free)
-2. Open Android Studio. On the **Welcome** screen, click **More Actions → Virtual Device Manager**:
-
-   ![Android Studio welcome screen with More Actions menu open and Virtual Device Manager highlighted](image.png)
-
-3. Click **Create Device**, pick a device and a system image, then start the emulator
-4. Once the emulator is running:
-
-```bash
-dotnet run --project src/Outty.Mobile -f net10.0-android
-```
-
-#### Windows (Windows machine only)
+### Windows
 
 ```bash
 dotnet run --project src/Outty.Mobile -f net10.0-windows10.0.19041.0
@@ -163,18 +117,41 @@ dotnet run --project src/Outty.Mobile -f net10.0-windows10.0.19041.0
 
 ---
 
-### Common errors and fixes
+## Features
 
-| Error                                                   | Fix                                                         |
-| ------------------------------------------------------- | ----------------------------------------------------------- |
-| `XA5207: Could not find android.jar for API level 36`   | Run the Android SDK install command above                   |
-| `Android SDK license agreements were not accepted`      | Add `-p:AcceptAndroidSDKLicenses=true` to the build command |
-| `NETSDK1005: project.assets.json doesn't have a target` | Run `dotnet restore` first                                  |
-| `Inadequate permissions` on workload install            | Use `sudo dotnet workload install maui`                     |
-| Java version error (needs 17, has 11)                   | Run `brew install --cask temurin@17`                        |
+Current and planned functionality includes:
+
+- User account creation
+- Google Sign-In
+- User profile management
+- Outdoor activity preferences
+- Swipe-based matching
+- Match notifications
+- Search radius preferences
+- Availability scheduling
+- Azure SQL data storage
+
+---
+
+## Development Process
+
+This project follows Scrum practices as part of the SWE 6733 course. Development includes:
+
+- Product Backlog
+- Sprint Planning
+- Sprint Reviews
+- Sprint Retrospectives
+- GitHub Projects for backlog management
+- Continuous integration using GitHub Actions
 
 ---
 
 ## AI Usage
 
-AI tools were used to assist with brainstorming, planning, and document organization. All AI-generated content was reviewed, revised, and validated by the team before submission.
+AI tools were used to assist with brainstorming, planning, document organization, and code suggestions. All generated content was reviewed, validated, and modified by the development team before submission.
+
+---
+
+## License
+
+This repository was created for educational purposes as part of the SWE 6733 – Emerging Software Engineering Processes course at Kennesaw State University.
