@@ -328,39 +328,6 @@
 
             </Border>
 
-            <!-- Experience level -->
-
-            <Label
-                FontAttributes="Bold"
-                Text="Experience Level"
-                TextColor="#183D2B" />
-
-            <Border
-                BackgroundColor="White"
-                Stroke="#D7DDD8"
-                StrokeThickness="1">
-
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12" />
-                </Border.StrokeShape>
-
-                <Picker
-                    x:Name="ExperiencePicker"
-                    Margin="12,4"
-                    TextColor="#222222"
-                    Title="Select experience level"
-                    TitleColor="#727B74">
-
-                    <Picker.Items>
-                        <x:String>Beginner</x:String>
-                        <x:String>Intermediate</x:String>
-                        <x:String>Advanced</x:String>
-                    </Picker.Items>
-
-                </Picker>
-
-            </Border>
-
             <!-- Travel distance -->
 
             <Label
@@ -462,6 +429,11 @@
                 Text="Outdoor Interests"
                 TextColor="#183D2B" />
 
+            <Label
+                FontSize="12"
+                Text="Check an activity and set your experience level for it"
+                TextColor="#727B74" />
+
             <Border
                 Padding="14"
                 BackgroundColor="White"
@@ -472,75 +444,165 @@
                     <RoundRectangle CornerRadius="12" />
                 </Border.StrokeShape>
 
-                <Grid
-                    ColumnDefinitions="Auto,*"
-                    RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
-                    RowSpacing="9">
+                <VerticalStackLayout Spacing="14">
 
-                    <CheckBox x:Name="HikingCheckBox" />
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <CheckBox
+                                x:Name="HikingCheckBox"
+                                CheckedChanged="OnInterestCheckedChanged" />
+                            <Label
+                                Grid.Column="1"
+                                Text="🥾 Hiking"
+                                TextColor="#222222"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Picker
+                            x:Name="HikingExperiencePicker"
+                            IsVisible="False"
+                            MinimumHeightRequest="44"
+                            Title="Experience level"
+                            TitleColor="#727B74"
+                            TextColor="#222222">
+                            <Picker.Items>
+                                <x:String>Beginner</x:String>
+                                <x:String>Intermediate</x:String>
+                                <x:String>Advanced</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
-                    <Label
-                        Grid.Column="1"
-                        Text="🥾 Hiking"
-                        TextColor="#222222"
-                        VerticalOptions="Center" />
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <CheckBox
+                                x:Name="CampingCheckBox"
+                                CheckedChanged="OnInterestCheckedChanged" />
+                            <Label
+                                Grid.Column="1"
+                                Text="🏕 Camping"
+                                TextColor="#222222"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Picker
+                            x:Name="CampingExperiencePicker"
+                            IsVisible="False"
+                            MinimumHeightRequest="44"
+                            Title="Experience level"
+                            TitleColor="#727B74"
+                            TextColor="#222222">
+                            <Picker.Items>
+                                <x:String>Beginner</x:String>
+                                <x:String>Intermediate</x:String>
+                                <x:String>Advanced</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
-                    <CheckBox
-                        x:Name="CampingCheckBox"
-                        Grid.Row="1" />
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <CheckBox
+                                x:Name="KayakingCheckBox"
+                                CheckedChanged="OnInterestCheckedChanged" />
+                            <Label
+                                Grid.Column="1"
+                                Text="🚣 Kayaking"
+                                TextColor="#222222"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Picker
+                            x:Name="KayakingExperiencePicker"
+                            IsVisible="False"
+                            MinimumHeightRequest="44"
+                            Title="Experience level"
+                            TitleColor="#727B74"
+                            TextColor="#222222">
+                            <Picker.Items>
+                                <x:String>Beginner</x:String>
+                                <x:String>Intermediate</x:String>
+                                <x:String>Advanced</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Text="🏕 Camping"
-                        TextColor="#222222"
-                        VerticalOptions="Center" />
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <CheckBox
+                                x:Name="ClimbingCheckBox"
+                                CheckedChanged="OnInterestCheckedChanged" />
+                            <Label
+                                Grid.Column="1"
+                                Text="🧗 Rock Climbing"
+                                TextColor="#222222"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Picker
+                            x:Name="ClimbingExperiencePicker"
+                            IsVisible="False"
+                            MinimumHeightRequest="44"
+                            Title="Experience level"
+                            TitleColor="#727B74"
+                            TextColor="#222222">
+                            <Picker.Items>
+                                <x:String>Beginner</x:String>
+                                <x:String>Intermediate</x:String>
+                                <x:String>Advanced</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
-                    <CheckBox
-                        x:Name="KayakingCheckBox"
-                        Grid.Row="2" />
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <CheckBox
+                                x:Name="CyclingCheckBox"
+                                CheckedChanged="OnInterestCheckedChanged" />
+                            <Label
+                                Grid.Column="1"
+                                Text="🚲 Cycling"
+                                TextColor="#222222"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Picker
+                            x:Name="CyclingExperiencePicker"
+                            IsVisible="False"
+                            MinimumHeightRequest="44"
+                            Title="Experience level"
+                            TitleColor="#727B74"
+                            TextColor="#222222">
+                            <Picker.Items>
+                                <x:String>Beginner</x:String>
+                                <x:String>Intermediate</x:String>
+                                <x:String>Advanced</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
-                    <Label
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Text="🚣 Kayaking"
-                        TextColor="#222222"
-                        VerticalOptions="Center" />
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <CheckBox
+                                x:Name="TravelCheckBox"
+                                CheckedChanged="OnInterestCheckedChanged" />
+                            <Label
+                                Grid.Column="1"
+                                Text="🗺 Travel and Road Trips"
+                                TextColor="#222222"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Picker
+                            x:Name="TravelExperiencePicker"
+                            IsVisible="False"
+                            MinimumHeightRequest="44"
+                            Title="Experience level"
+                            TitleColor="#727B74"
+                            TextColor="#222222">
+                            <Picker.Items>
+                                <x:String>Beginner</x:String>
+                                <x:String>Intermediate</x:String>
+                                <x:String>Advanced</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
-                    <CheckBox
-                        x:Name="ClimbingCheckBox"
-                        Grid.Row="3" />
-
-                    <Label
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Text="🧗 Rock Climbing"
-                        TextColor="#222222"
-                        VerticalOptions="Center" />
-
-                    <CheckBox
-                        x:Name="CyclingCheckBox"
-                        Grid.Row="4" />
-
-                    <Label
-                        Grid.Row="4"
-                        Grid.Column="1"
-                        Text="🚲 Cycling"
-                        TextColor="#222222"
-                        VerticalOptions="Center" />
-
-                    <CheckBox
-                        x:Name="TravelCheckBox"
-                        Grid.Row="5" />
-
-                    <Label
-                        Grid.Row="5"
-                        Grid.Column="1"
-                        Text="🗺 Travel and Road Trips"
-                        TextColor="#222222"
-                        VerticalOptions="Center" />
-
-                </Grid>
+                </VerticalStackLayout>
             </Border>
 
             <!-- Error message -->

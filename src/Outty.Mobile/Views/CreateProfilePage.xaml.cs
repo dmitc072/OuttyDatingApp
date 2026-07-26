@@ -40,12 +40,30 @@ public partial class CreateProfilePage : ContentPage
 
         try
         {
-            var selectedPhotos =
-                await MediaPicker.Default.PickPhotosAsync(
+            IEnumerable<FileResult> selectedPhotos;
+
+            try
+            {
+                selectedPhotos = await MediaPicker.Default.PickPhotosAsync(
                     new MediaPickerOptions
                     {
                         Title = "Select profile photos"
                     });
+            }
+            catch (Exception ex) when (ex.Message.Contains("No Activity found to handle Intent"))
+            {
+                // Falls back to the Storage Access Framework file picker when the
+                // system Photo Picker (Android 13+, or 11-12 with the Play module)
+                // isn't available on this device/emulator image.
+                var pickedFiles = await FilePicker.Default.PickMultipleAsync(
+                    new PickOptions
+                    {
+                        PickerTitle = "Select profile photos",
+                        FileTypes = FilePickerFileType.Images
+                    });
+
+                selectedPhotos = pickedFiles?.OfType<FileResult>() ?? [];
+            }
 
             if (selectedPhotos is null)
             {
@@ -282,14 +300,6 @@ public partial class CreateProfilePage : ContentPage
             return;
         }
 
-        if (ExperiencePicker.SelectedIndex == -1)
-        {
-            ShowError(
-                "Please select an experience level.");
-
-            return;
-        }
-
         if (DistancePicker.SelectedIndex == -1)
         {
             ShowError(
@@ -310,6 +320,14 @@ public partial class CreateProfilePage : ContentPage
         {
             ShowError(
                 "Please select at least one outdoor interest.");
+
+            return;
+        }
+
+        if (!SelectedInterestsHaveExperienceLevel())
+        {
+            ShowError(
+                "Please select an experience level for each checked interest.");
 
             return;
         }
@@ -342,11 +360,6 @@ public partial class CreateProfilePage : ContentPage
         Preferences.Default.Set(
             "ProfileBio",
             BioEditor.Text?.Trim() ?? string.Empty);
-
-        Preferences.Default.Set(
-            "ProfileExperience",
-            ExperiencePicker.SelectedItem?.ToString()
-            ?? "Not selected");
 
         Preferences.Default.Set(
             "ProfileDistance",
@@ -398,41 +411,66 @@ public partial class CreateProfilePage : ContentPage
         return string.Join(", ", selections);
     }
 
+    private void OnInterestCheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        var checkBox = sender as CheckBox;
+
+        foreach (var row in GetInterestRows())
+        {
+            if (row.CheckBox == checkBox)
+            {
+                row.ExperiencePicker.IsVisible = e.Value;
+
+                if (!e.Value)
+                {
+                    row.ExperiencePicker.SelectedIndex = -1;
+                }
+
+                break;
+            }
+        }
+    }
+
+    private (CheckBox CheckBox, Picker ExperiencePicker, string Name)[] GetInterestRows()
+    {
+        return
+        [
+            (HikingCheckBox, HikingExperiencePicker, "Hiking"),
+            (CampingCheckBox, CampingExperiencePicker, "Camping"),
+            (KayakingCheckBox, KayakingExperiencePicker, "Kayaking"),
+            (ClimbingCheckBox, ClimbingExperiencePicker, "Rock Climbing"),
+            (CyclingCheckBox, CyclingExperiencePicker, "Cycling"),
+            (TravelCheckBox, TravelExperiencePicker, "Travel and Road Trips")
+        ];
+    }
+
     private string BuildInterestsText()
     {
         var selections = new List<string>();
 
-        if (HikingCheckBox.IsChecked)
+        foreach (var row in GetInterestRows())
         {
-            selections.Add("Hiking");
-        }
-
-        if (CampingCheckBox.IsChecked)
-        {
-            selections.Add("Camping");
-        }
-
-        if (KayakingCheckBox.IsChecked)
-        {
-            selections.Add("Kayaking");
-        }
-
-        if (ClimbingCheckBox.IsChecked)
-        {
-            selections.Add("Rock Climbing");
-        }
-
-        if (CyclingCheckBox.IsChecked)
-        {
-            selections.Add("Cycling");
-        }
-
-        if (TravelCheckBox.IsChecked)
-        {
-            selections.Add("Travel and Road Trips");
+            if (row.CheckBox.IsChecked)
+            {
+                selections.Add(
+                    $"{row.Name} ({row.ExperiencePicker.SelectedItem})");
+            }
         }
 
         return string.Join(", ", selections);
+    }
+
+    private bool SelectedInterestsHaveExperienceLevel()
+    {
+        foreach (var row in GetInterestRows())
+        {
+            if (row.CheckBox.IsChecked && row.ExperiencePicker.SelectedIndex == -1)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private bool HasSelectedGoal()
