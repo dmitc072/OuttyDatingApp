@@ -22,9 +22,7 @@ public partial class ProfilePage : ContentPage
                 "Outty User");
 
         ProfileLocationLabel.Text =
-            Preferences.Default.Get(
-                "ProfileLocation",
-                "Location not added");
+            BuildLocationText();
 
         ProfilePronounsLabel.Text =
             Preferences.Default.Get(
@@ -74,6 +72,29 @@ public partial class ProfilePage : ContentPage
             ProfileImage.BackgroundColor =
                 Color.FromArgb("#E4EAE3");
         }
+    }
+
+    private string BuildLocationText()
+    {
+        var city = Preferences.Default.Get("ProfileCity", string.Empty);
+        var state = Preferences.Default.Get("ProfileState", string.Empty);
+
+        if (string.IsNullOrWhiteSpace(city) && string.IsNullOrWhiteSpace(state))
+        {
+            return "Location not added";
+        }
+
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return city;
+        }
+
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            return state;
+        }
+
+        return $"{city}, {state}";
     }
 
     private async void OnEditProfileClicked(

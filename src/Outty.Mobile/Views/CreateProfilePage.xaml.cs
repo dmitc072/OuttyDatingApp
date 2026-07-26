@@ -284,10 +284,27 @@ public partial class CreateProfilePage : ContentPage
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(LocationEntry.Text))
+        if (string.IsNullOrWhiteSpace(CityEntry.Text))
         {
             ShowError(
-                "Please enter your location.");
+                "Please enter your city.");
+
+            return;
+        }
+
+        if (StatePicker.SelectedIndex == -1)
+        {
+            ShowError(
+                "Please select your state.");
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(ZipCodeEntry.Text) ||
+            ZipCodeEntry.Text.Trim().Length != 5)
+        {
+            ShowError(
+                "Please enter a valid 5-digit ZIP code.");
 
             return;
         }
@@ -349,8 +366,16 @@ public partial class CreateProfilePage : ContentPage
             NameEntry.Text?.Trim() ?? string.Empty);
 
         Preferences.Default.Set(
-            "ProfileLocation",
-            LocationEntry.Text?.Trim() ?? string.Empty);
+            "ProfileCity",
+            CityEntry.Text?.Trim() ?? string.Empty);
+
+        Preferences.Default.Set(
+            "ProfileState",
+            StatePicker.SelectedItem?.ToString() ?? string.Empty);
+
+        Preferences.Default.Set(
+            "ProfileZipCode",
+            ZipCodeEntry.Text?.Trim() ?? string.Empty);
 
         Preferences.Default.Set(
             "ProfilePronouns",
