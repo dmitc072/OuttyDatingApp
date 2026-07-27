@@ -215,6 +215,13 @@ app.MapGet("/matches/candidates/{profileId:int}", async (int profileId, Matching
 })
 .WithName("GetMatchCandidates");
 
+app.MapGet("/matches/{profileId:int}", async (int profileId, MatchingService matchingService) =>
+{
+    var matches = await matchingService.GetMatchesAsync(profileId);
+    return matches;
+})
+.WithName("GetMatches");
+
 app.MapPost("/matches/swipe", async (SwipeRequest request, MatchingService matchingService) =>
 {
     var result = await matchingService.RecordSwipeAsync(

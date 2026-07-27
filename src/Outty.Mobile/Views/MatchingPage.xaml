@@ -31,6 +31,17 @@
 
             </VerticalStackLayout>
 
+            <Button
+                Grid.Column="1"
+                Text="💚 Matches"
+                Clicked="OnMatchesClicked"
+                VerticalOptions="Center"
+                CornerRadius="10"
+                Padding="12,8"
+                FontSize="13"
+                BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B3B22}"
+                TextColor="#2E7D32" />
+
         </Grid>
 
         <Grid Grid.Row="1" Padding="20">

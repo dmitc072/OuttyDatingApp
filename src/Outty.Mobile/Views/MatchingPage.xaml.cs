@@ -87,6 +87,9 @@ public partial class MatchingPage : ContentPage
 
     private async void OnRefreshClicked(object? sender, EventArgs e) => await LoadCandidatesAsync();
 
+    private async void OnMatchesClicked(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync(nameof(MatchesPage));
+
     private async Task SwipeAsync(bool liked)
     {
         if (_currentIndex >= _candidates.Count)

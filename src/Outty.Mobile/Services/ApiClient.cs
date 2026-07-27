@@ -31,6 +31,13 @@ public record CandidateProfile(
 
 public record SwipeResult(bool IsMatch, int? ConversationId);
 
+public record MatchSummary(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    int ConversationId);
+
 public class ApiClient
 {
     private readonly HttpClient _httpClient;
@@ -77,6 +84,16 @@ public class ApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<List<CandidateProfile>>()
+            ?? [];
+    }
+
+    public async Task<List<MatchSummary>> GetMatchesAsync(int profileId)
+    {
+        using var response = await _httpClient.GetAsync($"/matches/{profileId}");
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<List<MatchSummary>>()
             ?? [];
     }
 

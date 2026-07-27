@@ -25,6 +25,10 @@ public partial class AppShell : Shell
             nameof(ChatPage),
             typeof(ChatPage));
 
+        Routing.RegisterRoute(
+            nameof(MatchesPage),
+            typeof(MatchesPage));
+
         MessagesShellContent.ContentTemplate =
             new DataTemplate(() =>
                 serviceProvider.GetRequiredService<ConversationsPage>());

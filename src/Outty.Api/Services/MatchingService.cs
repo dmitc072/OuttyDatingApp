@@ -12,6 +12,13 @@ public record CandidateProfile(
 
 public record SwipeResult(bool IsMatch, int? ConversationId);
 
+public record MatchSummary(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    int ConversationId);
+
 public class MatchingService(OuttyDbContext db, ConversationService conversationService)
 {
     public async Task<List<CandidateProfile>> GetCandidatesAsync(int profileId)
@@ -53,6 +60,65 @@ public class MatchingService(OuttyDbContext db, ConversationService conversation
             .OrderByDescending(c => c.SharedInterestCount)
             .ThenBy(c => c.DisplayName)
             .ToList();
+    }
+
+    public async Task<List<MatchSummary>> GetMatchesAsync(int profileId)
+    {
+        var myProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == profileId);
+
+        if (myProfile is null)
+        {
+            return [];
+        }
+
+        var likedProfileIds = await db.Swipes
+            .Where(s => s.SwiperProfileId == profileId && s.Liked)
+            .Select(s => s.TargetProfileId)
+            .ToListAsync();
+
+        if (likedProfileIds.Count == 0)
+        {
+            return [];
+        }
+
+        var matchedProfileIds = await db.Swipes
+            .Where(s =>
+                s.TargetProfileId == profileId &&
+                s.Liked &&
+                likedProfileIds.Contains(s.SwiperProfileId))
+            .Select(s => s.SwiperProfileId)
+            .ToListAsync();
+
+        if (matchedProfileIds.Count == 0)
+        {
+            return [];
+        }
+
+        var matchedProfiles = await db.Profiles
+            .Where(p => matchedProfileIds.Contains(p.Id))
+            .ToListAsync();
+
+        var matches = new List<MatchSummary>();
+
+        foreach (var matchedProfile in matchedProfiles)
+        {
+            var conversation = await conversationService.FindOrCreateConversationAsync(
+                myProfile.UserId, matchedProfile.UserId);
+
+            if (conversation is null)
+            {
+                continue;
+            }
+
+            matches.Add(new MatchSummary(
+                matchedProfile.Id,
+                matchedProfile.DisplayName,
+                matchedProfile.City,
+                matchedProfile.State,
+                conversation.ConversationId));
+        }
+
+        return matches.OrderBy(m => m.DisplayName).ToList();
     }
 
     /// <summary>
