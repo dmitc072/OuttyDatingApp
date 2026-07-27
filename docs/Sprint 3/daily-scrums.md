@@ -23,9 +23,22 @@ The SQL server firewall had to be updated twice this sprint — once for the dev
 
 **What did I do in the last 24 hours?**
 
+Continued refining the profile creation experience by planning the implementation of City, State, and ZIP Code fields to support future location-based matching. 
+
+Collaborated with the team on the search radius feature and discussed the best approach for storing and using location data for matching users.
+
+Investigated the Azure SQL database configuration and confirmed the server connection information. Verified that the remaining blocker for the messaging feature is obtaining the database credentials to complete the connection.
+
 **What will I do in the next 24 hours?**
 
+Implement the location fields within the profile creation and profile display pages.
+
+Begin wiring the search radius setting in the mobile application to the backend endpoint once it is available.
+
+Continue testing profile functionality and complete messaging integration after the Azure SQL credentials are received.
 **Any impediments?**
+
+Still waiting on the Azure SQL database password to configure the API connection and complete end-to-end testing of the messaging feature. Until credentials are received, database-dependent features cannot be fully validated
 
 ---
 
@@ -45,3 +58,4 @@ The SQL server firewall had to be updated twice this sprint — once for the dev
 |---|---|---|---|---|
 | Day 3 (Jul 22) | SQL firewall rejected connections after dev machine's public IP changed | Duane | Resolved | Added new firewall rule for the current IP |
 | Day 3 (Jul 22) | Serverless DB cold-start caused a connection timeout on first request after idle | Duane | Known/Accepted | Retried successfully; not a bug, an expected serverless auto-pause behavior |
+| Day 3 (Jul 22) | Azure SQL credentials (database password) not yet available, preventing API connection and end-to-end testing of messaging functionality | Jazmin | Open | Waiting for the completed Azure SQL connection credentials from the Scrum Master before configuring User Secrets and validating the messaging feature.|

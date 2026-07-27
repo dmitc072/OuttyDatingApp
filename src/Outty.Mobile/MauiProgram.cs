@@ -1,4 +1,6 @@
-﻿using Outty.Mobile.Views;
+﻿using Microsoft.Extensions.Logging;
+using Outty.Mobile.Services;
+using Outty.Mobile.Views;
 
 namespace Outty.Mobile;
 
@@ -23,12 +25,25 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<AppShell>();
 
-        builder.Services.AddTransient<LoginPage>();
-        builder.Services.AddTransient<HomePage>();
-        builder.Services.AddTransient<CreateProfilePage>();
-        builder.Services.AddTransient<ProfilePage>();
-        builder.Services.AddTransient<SettingsPage>();
-        builder.Services.AddTransient<DeleteAccountPage>();
+        builder.Services.AddSingleton(provider =>
+        {
+            return new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:7001/"),
+                Timeout = TimeSpan.FromSeconds(15)
+            };
+        });
+
+builder.Services.AddSingleton<
+    IMessagingService,
+    MessagingService>();
+
+        builder.Services.AddTransient<ConversationsPage>();
+        builder.Services.AddTransient<ChatPage>();
+
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
 
         return builder.Build();
     }
