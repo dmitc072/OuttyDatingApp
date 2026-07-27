@@ -51,7 +51,7 @@ public class MatchingServiceTests
     {
         await using var db = CreateContext();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(profileId: 999);
 
         Assert.Empty(candidates);
@@ -65,7 +65,7 @@ public class MatchingServiceTests
         var profile = AddProfile(db, user, "Solo", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(profile.Id);
 
         Assert.Empty(candidates);
@@ -79,7 +79,7 @@ public class MatchingServiceTests
         AddProfile(db, AddUser(db, "b@example.com"), "B", "GA", 2);                 // Kayaking only
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(requester.Id);
 
         Assert.Empty(candidates);
@@ -93,7 +93,7 @@ public class MatchingServiceTests
         var other = AddProfile(db, AddUser(db, "b@example.com"), "B", "GA", 1, 2);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(requester.Id);
 
         var candidate = Assert.Single(candidates);
@@ -109,7 +109,7 @@ public class MatchingServiceTests
         AddProfile(db, AddUser(db, "b@example.com"), "B", "TX", 1); // same interest, different state
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(requester.Id);
 
         Assert.Empty(candidates);
@@ -125,7 +125,7 @@ public class MatchingServiceTests
         var twoShared = AddProfile(db, AddUser(db, "d@example.com"), "TwoShared", "GA", 1, 2);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(requester.Id);
 
         Assert.Equal(
@@ -140,7 +140,7 @@ public class MatchingServiceTests
         var requester = AddProfile(db, AddUser(db, "a@example.com"), "A", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var candidates = await service.GetCandidatesAsync(requester.Id);
 
         Assert.Empty(candidates);
@@ -158,7 +158,7 @@ public class MatchingServiceTests
         var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
         var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
         await db.SaveChangesAsync();
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
 
         // When each requests their match candidates
         var aliceCandidates = await service.GetCandidatesAsync(alice.Id);
@@ -177,7 +177,7 @@ public class MatchingServiceTests
         var georgia = AddProfile(db, AddUser(db, "ga@example.com"), "GeorgiaUser", "GA", 1);
         AddProfile(db, AddUser(db, "tx@example.com"), "TexasUser", "TX", 1);
         await db.SaveChangesAsync();
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
 
         // When the Georgia user requests their match candidates
         var candidates = await service.GetCandidatesAsync(georgia.Id);
@@ -196,7 +196,7 @@ public class MatchingServiceTests
         var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var result = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
 
         Assert.NotNull(result);
@@ -212,7 +212,7 @@ public class MatchingServiceTests
         var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
 
         var bobLikesAlice = await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
         Assert.False(bobLikesAlice!.IsMatch);
@@ -230,7 +230,7 @@ public class MatchingServiceTests
         var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
 
         var alicePassesOnBob = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: false);
@@ -246,7 +246,7 @@ public class MatchingServiceTests
         var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         await service.RecordSwipeAsync(alice.Id, bob.Id, liked: false);
         await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
 
@@ -261,7 +261,7 @@ public class MatchingServiceTests
         var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         var result = await service.RecordSwipeAsync(alice.Id, targetProfileId: 999, liked: true);
 
         Assert.Null(result);
@@ -276,12 +276,74 @@ public class MatchingServiceTests
         var notYetSwiped = AddProfile(db, AddUser(db, "c@example.com"), "C", "GA", 1);
         await db.SaveChangesAsync();
 
-        var service = new MatchingService(db);
+        var service = new MatchingService(db, new ConversationService(db));
         await service.RecordSwipeAsync(requester.Id, alreadySwiped.Id, liked: true);
 
         var candidates = await service.GetCandidatesAsync(requester.Id);
 
         var candidate = Assert.Single(candidates);
         Assert.Equal(notYetSwiped.Id, candidate.ProfileId);
+    }
+
+    // ── RecordSwipeAsync + messaging integration ──
+
+    [Fact]
+    public async Task RecordSwipeAsync_ALikeWithNoReciprocalLike_HasNoConversation()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        var result = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        Assert.Null(result!.ConversationId);
+        Assert.Equal(0, await db.Conversations.CountAsync());
+    }
+
+    [Fact]
+    public async Task RecordSwipeAsync_WhenBothProfilesLikeEachOther_CreatesAConversationBetweenTheirUsers()
+    {
+        await using var db = CreateContext();
+        var aliceUser = AddUser(db, "alice@example.com");
+        var bobUser = AddUser(db, "bob@example.com");
+        var alice = AddProfile(db, aliceUser, "Alice", "GA", 1);
+        var bob = AddProfile(db, bobUser, "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
+        var result = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        Assert.True(result!.IsMatch);
+        Assert.NotNull(result.ConversationId);
+
+        var conversation = await db.Conversations
+            .Include(c => c.ConversationParticipants)
+            .SingleAsync(c => c.Id == result.ConversationId);
+
+        Assert.Equal(2, conversation.ConversationParticipants.Count);
+        Assert.Contains(conversation.ConversationParticipants, p => p.UserId == aliceUser.Id);
+        Assert.Contains(conversation.ConversationParticipants, p => p.UserId == bobUser.Id);
+    }
+
+    [Fact]
+    public async Task RecordSwipeAsync_MatchingAgainAfterAlreadyMatched_ReusesTheSameConversation()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
+        var firstMatch = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        // Re-recording the same like (e.g. re-opening the match card) should not create a second conversation.
+        var secondMatch = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        Assert.Equal(firstMatch!.ConversationId, secondMatch!.ConversationId);
+        Assert.Equal(1, await db.Conversations.CountAsync());
     }
 }

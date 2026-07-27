@@ -29,7 +29,7 @@ public static class MauiProgram
         {
             return new HttpClient
             {
-                BaseAddress = new Uri("https://localhost:7001/"),
+                BaseAddress = new Uri(ApiOptions.BaseAddress),
                 Timeout = TimeSpan.FromSeconds(15)
             };
         });

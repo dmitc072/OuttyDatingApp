@@ -10,9 +10,9 @@ public record CandidateProfile(
     string State,
     int SharedInterestCount);
 
-public record SwipeResult(bool IsMatch);
+public record SwipeResult(bool IsMatch, int? ConversationId);
 
-public class MatchingService(OuttyDbContext db)
+public class MatchingService(OuttyDbContext db, ConversationService conversationService)
 {
     public async Task<List<CandidateProfile>> GetCandidatesAsync(int profileId)
     {
@@ -66,10 +66,10 @@ public class MatchingService(OuttyDbContext db)
             return null;
         }
 
-        var swiperExists = await db.Profiles.AnyAsync(p => p.Id == swiperProfileId);
-        var targetExists = await db.Profiles.AnyAsync(p => p.Id == targetProfileId);
+        var swiperProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == swiperProfileId);
+        var targetProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == targetProfileId);
 
-        if (!swiperExists || !targetExists)
+        if (swiperProfile is null || targetProfile is null)
         {
             return null;
         }
@@ -99,6 +99,16 @@ public class MatchingService(OuttyDbContext db)
             s.TargetProfileId == swiperProfileId &&
             s.Liked);
 
-        return new SwipeResult(isMatch);
+        int? conversationId = null;
+
+        if (isMatch)
+        {
+            var conversation = await conversationService.FindOrCreateConversationAsync(
+                swiperProfile.UserId, targetProfile.UserId);
+
+            conversationId = conversation?.ConversationId;
+        }
+
+        return new SwipeResult(isMatch, conversationId);
     }
 }

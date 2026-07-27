@@ -20,6 +20,7 @@ builder.Services.AddDbContext<OuttyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OuttyDb")));
 
 builder.Services.AddScoped<MatchingService>();
+builder.Services.AddScoped<ConversationService>();
 
 var app = builder.Build();
 

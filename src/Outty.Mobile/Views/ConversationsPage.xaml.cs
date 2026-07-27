@@ -12,8 +12,7 @@ public partial class ConversationsPage : ContentPage
     private bool _isLoading;
     private bool _isRefreshing;
 
-    // Temporary user ID until authentication is fully connected.
-    private const int CurrentUserId = 1;
+    private static int CurrentUserId => Preferences.Default.Get("UserId", -1);
 
     public ObservableCollection<ConversationSummaryDto> Conversations { get; }
         = [];
@@ -49,7 +48,9 @@ public partial class ConversationsPage : ContentPage
 
     protected override void OnAppearing()
     {
-    base.OnAppearing();
+        base.OnAppearing();
+
+        _ = LoadConversationsAsync();
     }
 
     private async Task LoadConversationsAsync()

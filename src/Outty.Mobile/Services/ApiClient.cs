@@ -29,7 +29,7 @@ public record CandidateProfile(
     string State,
     int SharedInterestCount);
 
-public record SwipeResult(bool IsMatch);
+public record SwipeResult(bool IsMatch, int? ConversationId);
 
 public class ApiClient
 {

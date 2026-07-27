@@ -105,10 +105,18 @@ public partial class MatchingPage : ContentPage
 
             if (liked && result.IsMatch)
             {
-                await DisplayAlert(
+                var shouldOpenChat = await DisplayAlert(
                     "It's a Match!",
                     $"You and {candidate.DisplayName} both liked each other.",
-                    "OK");
+                    "Message Now",
+                    "Keep Swiping");
+
+                if (shouldOpenChat && result.ConversationId is int conversationId)
+                {
+                    await Shell.Current.GoToAsync(
+                        $"{nameof(ChatPage)}?conversationId={conversationId}&otherUserName={Uri.EscapeDataString(candidate.DisplayName)}");
+                    return;
+                }
             }
         }
         catch (Exception ex)

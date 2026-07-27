@@ -9,8 +9,7 @@ public partial class ChatPage : ContentPage, IQueryAttributable
 {
     private readonly IMessagingService _messagingService;
 
-    // Temporary user ID until authentication is fully connected.
-    private const int CurrentUserId = 1;
+    private static int CurrentUserId => Preferences.Default.Get("UserId", -1);
 
     private int _conversationId;
     private string _otherUserName = "Chat";
