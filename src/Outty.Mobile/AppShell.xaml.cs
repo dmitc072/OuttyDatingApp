@@ -29,6 +29,10 @@ public partial class AppShell : Shell
             nameof(MatchesPage),
             typeof(MatchesPage));
 
+        Routing.RegisterRoute(
+            nameof(LikedPage),
+            typeof(LikedPage));
+
         MessagesShellContent.ContentTemplate =
             new DataTemplate(() =>
                 serviceProvider.GetRequiredService<ConversationsPage>());

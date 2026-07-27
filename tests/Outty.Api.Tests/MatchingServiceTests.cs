@@ -419,4 +419,92 @@ public class MatchingServiceTests
         Assert.Empty(matches);
     }
 
+    // ── GetLikedProfilesAsync ──
+
+    [Fact]
+    public async Task GetLikedProfilesAsync_WithNoSwipes_ReturnsEmptyList()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        var liked = await service.GetLikedProfilesAsync(alice.Id);
+
+        Assert.Empty(liked);
+    }
+
+    [Fact]
+    public async Task GetLikedProfilesAsync_APass_IsNotIncluded()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        await service.RecordSwipeAsync(alice.Id, bob.Id, liked: false);
+
+        var liked = await service.GetLikedProfilesAsync(alice.Id);
+
+        Assert.Empty(liked);
+    }
+
+    [Fact]
+    public async Task GetLikedProfilesAsync_ALikeWithNoReciprocalLike_ShowsUpAsNotYetMatched()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        var liked = await service.GetLikedProfilesAsync(alice.Id);
+
+        var likedProfile = Assert.Single(liked);
+        Assert.Equal(bob.Id, likedProfile.ProfileId);
+        Assert.False(likedProfile.IsMatch);
+        Assert.Null(likedProfile.ConversationId);
+    }
+
+    [Fact]
+    public async Task GetLikedProfilesAsync_AfterAMutualLike_ShowsUpAsMatchedWithAConversationId()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+        var swipeResult = await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
+
+        var liked = await service.GetLikedProfilesAsync(alice.Id);
+
+        var likedProfile = Assert.Single(liked);
+        Assert.Equal(bob.Id, likedProfile.ProfileId);
+        Assert.True(likedProfile.IsMatch);
+        Assert.Equal(swipeResult!.ConversationId, likedProfile.ConversationId);
+    }
+
+    [Fact]
+    public async Task GetLikedProfilesAsync_ListsMatchesBeforeNotYetMatchedProfiles()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        var casey = AddProfile(db, AddUser(db, "casey@example.com"), "Casey", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db, new ConversationService(db));
+        await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);   // one-sided
+        await service.RecordSwipeAsync(alice.Id, casey.Id, liked: true);
+        await service.RecordSwipeAsync(casey.Id, alice.Id, liked: true); // mutual
+
+        var liked = await service.GetLikedProfilesAsync(alice.Id);
+
+        Assert.Equal([casey.Id, bob.Id], liked.Select(l => l.ProfileId));
+    }
 }

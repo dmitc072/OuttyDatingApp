@@ -215,6 +215,13 @@ app.MapGet("/matches/candidates/{profileId:int}", async (int profileId, Matching
 })
 .WithName("GetMatchCandidates");
 
+app.MapGet("/matches/liked/{profileId:int}", async (int profileId, MatchingService matchingService) =>
+{
+    var liked = await matchingService.GetLikedProfilesAsync(profileId);
+    return liked;
+})
+.WithName("GetLikedProfiles");
+
 app.MapGet("/matches/{profileId:int}", async (int profileId, MatchingService matchingService) =>
 {
     var matches = await matchingService.GetMatchesAsync(profileId);

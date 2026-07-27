@@ -31,16 +31,27 @@
 
             </VerticalStackLayout>
 
-            <Button
-                Grid.Column="1"
-                Text="💚 Matches"
-                Clicked="OnMatchesClicked"
-                VerticalOptions="Center"
-                CornerRadius="10"
-                Padding="12,8"
-                FontSize="13"
-                BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B3B22}"
-                TextColor="#2E7D32" />
+            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+
+                <Button
+                    Text="👍 Liked"
+                    Clicked="OnLikedClicked"
+                    CornerRadius="10"
+                    Padding="12,8"
+                    FontSize="13"
+                    BackgroundColor="{AppThemeBinding Light=#EEEEEE, Dark=#2A2A2A}"
+                    TextColor="{AppThemeBinding Light=#1E1E1E, Dark=White}" />
+
+                <Button
+                    Text="💚 Matches"
+                    Clicked="OnMatchesClicked"
+                    CornerRadius="10"
+                    Padding="12,8"
+                    FontSize="13"
+                    BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B3B22}"
+                    TextColor="#2E7D32" />
+
+            </HorizontalStackLayout>
 
         </Grid>
 

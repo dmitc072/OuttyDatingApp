@@ -38,6 +38,14 @@ public record MatchSummary(
     string State,
     int ConversationId);
 
+public record LikedProfile(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    bool IsMatch,
+    int? ConversationId);
+
 public class ApiClient
 {
     private readonly HttpClient _httpClient;
@@ -94,6 +102,16 @@ public class ApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<List<MatchSummary>>()
+            ?? [];
+    }
+
+    public async Task<List<LikedProfile>> GetLikedProfilesAsync(int profileId)
+    {
+        using var response = await _httpClient.GetAsync($"/matches/liked/{profileId}");
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<List<LikedProfile>>()
             ?? [];
     }
 
