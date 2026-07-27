@@ -82,16 +82,81 @@ app.MapPost("/profiles", async (CreateProfileRequest request, OuttyDbContext db)
         return Results.BadRequest("UserId does not exist.");
     }
 
-    var alreadyHasProfile = await db.Profiles.AnyAsync(p => p.UserId == request.UserId);
-    if (alreadyHasProfile)
-    {
-        return Results.Conflict("This user already has a profile.");
-    }
-
     var state = await db.States.FirstOrDefaultAsync(s => s.Abbreviation == request.State);
     if (state is null)
     {
         return Results.BadRequest($"Unknown state: {request.State}");
+    }
+
+    var interestSelections = new List<(Interest Interest, ExperienceLevel ExperienceLevel)>();
+
+    foreach (var interestRequest in request.Interests)
+    {
+        var interest = await db.Interests.FirstOrDefaultAsync(i => i.Name == interestRequest.Name);
+        var experienceLevel = await db.ExperienceLevels.FirstOrDefaultAsync(e => e.ExperienceLevel1 == interestRequest.ExperienceLevel);
+
+        if (interest is null || experienceLevel is null)
+        {
+            return Results.BadRequest($"Unknown interest or experience level: {interestRequest.Name} / {interestRequest.ExperienceLevel}");
+        }
+
+        interestSelections.Add((interest, experienceLevel));
+    }
+
+    var goals = new List<Goal>();
+
+    foreach (var goalName in request.Goals)
+    {
+        var goal = await db.Goals.FirstOrDefaultAsync(g => g.Name == goalName);
+
+        if (goal is null)
+        {
+            return Results.BadRequest($"Unknown goal: {goalName}");
+        }
+
+        goals.Add(goal);
+    }
+
+    var existingProfile = await db.Profiles
+        .Include(p => p.ProfileInterests)
+        .Include(p => p.Goals)
+        .FirstOrDefaultAsync(p => p.UserId == request.UserId);
+
+    // Editing an existing profile updates it in place instead of rejecting with a
+    // conflict — the mobile app reuses the same Create Profile screen for both
+    // first-time creation and later edits, so this endpoint has to support both.
+    if (existingProfile is not null)
+    {
+        existingProfile.DisplayName = request.DisplayName;
+        existingProfile.BirthDate = request.BirthDate;
+        existingProfile.City = request.City;
+        existingProfile.State = request.State;
+        existingProfile.ZipCode = request.ZipCode;
+        existingProfile.Pronouns = request.Pronouns;
+        existingProfile.Bio = request.Bio;
+        existingProfile.PreferredDistance = request.PreferredDistance;
+        existingProfile.SearchRadiusMiles = SearchRadiusValidator.Normalize(request.SearchRadiusMiles);
+        existingProfile.UpdatedAtUtc = DateTime.UtcNow;
+
+        existingProfile.ProfileInterests.Clear();
+        foreach (var (interest, experienceLevel) in interestSelections)
+        {
+            existingProfile.ProfileInterests.Add(new ProfileInterest
+            {
+                Interest = interest,
+                ExperienceLevel = experienceLevel
+            });
+        }
+
+        existingProfile.Goals.Clear();
+        foreach (var goal in goals)
+        {
+            existingProfile.Goals.Add(goal);
+        }
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok(new { existingProfile.Id });
     }
 
     var profile = new Profile
@@ -110,16 +175,8 @@ app.MapPost("/profiles", async (CreateProfileRequest request, OuttyDbContext db)
         UpdatedAtUtc = DateTime.UtcNow
     };
 
-    foreach (var interestRequest in request.Interests)
+    foreach (var (interest, experienceLevel) in interestSelections)
     {
-        var interest = await db.Interests.FirstOrDefaultAsync(i => i.Name == interestRequest.Name);
-        var experienceLevel = await db.ExperienceLevels.FirstOrDefaultAsync(e => e.ExperienceLevel1 == interestRequest.ExperienceLevel);
-
-        if (interest is null || experienceLevel is null)
-        {
-            return Results.BadRequest($"Unknown interest or experience level: {interestRequest.Name} / {interestRequest.ExperienceLevel}");
-        }
-
         profile.ProfileInterests.Add(new ProfileInterest
         {
             Interest = interest,
@@ -127,15 +184,8 @@ app.MapPost("/profiles", async (CreateProfileRequest request, OuttyDbContext db)
         });
     }
 
-    foreach (var goalName in request.Goals)
+    foreach (var goal in goals)
     {
-        var goal = await db.Goals.FirstOrDefaultAsync(g => g.Name == goalName);
-
-        if (goal is null)
-        {
-            return Results.BadRequest($"Unknown goal: {goalName}");
-        }
-
         profile.Goals.Add(goal);
     }
 
@@ -144,7 +194,7 @@ app.MapPost("/profiles", async (CreateProfileRequest request, OuttyDbContext db)
 
     return Results.Created($"/profiles/{profile.Id}", new { profile.Id });
 })
-.WithName("CreateProfile");
+.WithName("CreateOrUpdateProfile");
 
 app.MapGet("/states", async (OuttyDbContext db) =>
 {
