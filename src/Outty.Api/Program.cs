@@ -14,6 +14,8 @@ builder.Configuration.AddAzureKeyVault(
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddControllers();
+
 builder.Services.AddDbContext<OuttyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OuttyDb")));
 
@@ -28,6 +30,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
 
 
 app.MapPost("/users/login", async (GoogleLoginRequest request, OuttyDbContext db, IConfiguration config) =>

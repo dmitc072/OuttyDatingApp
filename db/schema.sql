@@ -57,6 +57,11 @@ CREATE TABLE dbo.Interests (
 INSERT INTO dbo.Interests (Name) VALUES
     ('Hiking'), ('Kayaking'), ('Climbing'), ('Backpacking'), ('Cycling'), ('Camping');
 
+-- Added to match the Create Profile page's interest checklist (Fishing/Running/Other
+-- were in the UI but missing from the seed data, causing /profiles to reject them).
+INSERT INTO dbo.Interests (Name) VALUES
+    ('Fishing'), ('Running'), ('Other');
+
 CREATE TABLE dbo.ExperienceLevel (
     Id  TINYINT     IDENTITY(1,1) PRIMARY KEY,
     ExperienceLevel NVARCHAR(30) NOT NULL
@@ -83,4 +88,26 @@ CREATE TABLE dbo.ProfileGoals (
     ProfileId  INT     NOT NULL REFERENCES dbo.Profiles(Id),
     GoalId     TINYINT NOT NULL REFERENCES dbo.Goals(Id),
     PRIMARY KEY (ProfileId, GoalId)
+);
+
+CREATE TABLE dbo.Conversations (
+    Id            INT       IDENTITY(1,1) PRIMARY KEY,
+    CreatedAtUtc  DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    UpdatedAtUtc  DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+);
+
+CREATE TABLE dbo.ConversationParticipants (
+    ConversationId  INT       NOT NULL REFERENCES dbo.Conversations(Id),
+    UserId          INT       NOT NULL REFERENCES dbo.Users(Id),
+    JoinedAtUtc     DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    PRIMARY KEY (ConversationId, UserId)
+);
+
+CREATE TABLE dbo.Messages (
+    Id              INT            IDENTITY(1,1) PRIMARY KEY,
+    ConversationId  INT            NOT NULL REFERENCES dbo.Conversations(Id),
+    SenderId        INT            NOT NULL REFERENCES dbo.Users(Id),
+    Content         NVARCHAR(2000) NOT NULL,
+    SentAtUtc       DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME(),
+    ReadAtUtc       DATETIME2      NULL
 );
