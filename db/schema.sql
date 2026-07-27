@@ -111,3 +111,12 @@ CREATE TABLE dbo.Messages (
     SentAtUtc       DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME(),
     ReadAtUtc       DATETIME2      NULL
 );
+
+CREATE TABLE dbo.Swipes (
+    Id              INT       IDENTITY(1,1) PRIMARY KEY,
+    SwiperProfileId INT       NOT NULL REFERENCES dbo.Profiles(Id),
+    TargetProfileId INT       NOT NULL REFERENCES dbo.Profiles(Id),
+    Liked           BIT       NOT NULL,
+    CreatedAtUtc    DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT UQ_Swipes_Swiper_Target UNIQUE (SwiperProfileId, TargetProfileId)
+);

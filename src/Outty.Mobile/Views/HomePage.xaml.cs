@@ -28,10 +28,18 @@ public partial class HomePage : ContentPage
         object? sender,
         EventArgs e)
     {
-        await DisplayAlertAsync(
-            "Coming Soon",
-            "Adventure matching will be available in a future sprint.",
-            "OK");
+        try
+        {
+            await Shell.Current.GoToAsync(
+                $"///{nameof(MatchingPage)}");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Navigation Error",
+                $"Unable to open Discover: {ex.Message}",
+                "OK");
+        }
     }
 
     private async void OnProfileClicked(

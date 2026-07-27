@@ -596,7 +596,7 @@ public partial class CreateProfilePage : ContentPage
 
             try
             {
-                await _apiClient.CreateProfileAsync(
+                var saveResult = await _apiClient.CreateProfileAsync(
                     BuildCreateProfileRequest(
                         userId,
                         displayName,
@@ -607,6 +607,8 @@ public partial class CreateProfilePage : ContentPage
                         dateOfBirth,
                         searchRadius,
                         selectedInterests));
+
+                Preferences.Default.Set("ProfileId", saveResult.Id);
             }
             catch (Exception ex)
             {

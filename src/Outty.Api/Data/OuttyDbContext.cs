@@ -31,6 +31,8 @@ public partial class OuttyDbContext : DbContext
 
     public virtual DbSet<State> States { get; set; }
 
+    public virtual DbSet<Swipe> Swipes { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -206,6 +208,25 @@ public partial class OuttyDbContext : DbContext
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Name).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Swipe>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Swipes");
+
+            entity.HasIndex(e => new { e.SwiperProfileId, e.TargetProfileId }, "UQ_Swipes_Swiper_Target").IsUnique();
+
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.SwiperProfile).WithMany()
+                .HasForeignKey(d => d.SwiperProfileId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Swipes_SwiperProfile");
+
+            entity.HasOne(d => d.TargetProfile).WithMany()
+                .HasForeignKey(d => d.TargetProfileId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Swipes_TargetProfile");
         });
 
         modelBuilder.Entity<User>(entity =>

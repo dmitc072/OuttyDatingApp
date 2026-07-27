@@ -22,6 +22,15 @@ public record CreateProfileRequest(
 
 public record CreateProfileResult(int Id);
 
+public record CandidateProfile(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    int SharedInterestCount);
+
+public record SwipeResult(bool IsMatch);
+
 public class ApiClient
 {
     private readonly HttpClient _httpClient;
@@ -59,5 +68,32 @@ public class ApiClient
 
         return await response.Content.ReadFromJsonAsync<CreateProfileResult>()
             ?? throw new InvalidOperationException("Create profile response was empty.");
+    }
+
+    public async Task<List<CandidateProfile>> GetCandidatesAsync(int profileId)
+    {
+        using var response = await _httpClient.GetAsync($"/matches/candidates/{profileId}");
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<List<CandidateProfile>>()
+            ?? [];
+    }
+
+    public async Task<SwipeResult> RecordSwipeAsync(int swiperProfileId, int targetProfileId, bool liked)
+    {
+        using var response = await _httpClient.PostAsJsonAsync(
+            "/matches/swipe",
+            new { SwiperProfileId = swiperProfileId, TargetProfileId = targetProfileId, Liked = liked });
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                $"Unable to record swipe ({(int)response.StatusCode}): {errorBody}");
+        }
+
+        return await response.Content.ReadFromJsonAsync<SwipeResult>()
+            ?? throw new InvalidOperationException("Swipe response was empty.");
     }
 }

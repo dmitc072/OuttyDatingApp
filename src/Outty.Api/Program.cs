@@ -214,6 +214,22 @@ app.MapGet("/matches/candidates/{profileId:int}", async (int profileId, Matching
 })
 .WithName("GetMatchCandidates");
 
+app.MapPost("/matches/swipe", async (SwipeRequest request, MatchingService matchingService) =>
+{
+    var result = await matchingService.RecordSwipeAsync(
+        request.SwiperProfileId,
+        request.TargetProfileId,
+        request.Liked);
+
+    if (result is null)
+    {
+        return Results.BadRequest("Invalid swiper or target profile.");
+    }
+
+    return Results.Ok(result);
+})
+.WithName("RecordSwipe");
+
 app.MapPut("/profiles/{profileId:int}/search-radius", async (int profileId, SearchRadiusRequest request, OuttyDbContext db) =>
 {
     var profile = await db.Profiles.FindAsync(profileId);
@@ -233,6 +249,8 @@ app.MapPut("/profiles/{profileId:int}/search-radius", async (int profileId, Sear
 app.Run();
 
 record SearchRadiusRequest(int? Miles);
+
+record SwipeRequest(int SwiperProfileId, int TargetProfileId, bool Liked);
 
 record GoogleLoginRequest(string IdToken);
 

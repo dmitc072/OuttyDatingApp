@@ -46,6 +46,7 @@ builder.Services.AddSingleton<
 
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<MatchingPage>();
         builder.Services.AddTransient<CreateProfilePage>();
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<SettingsPage>();

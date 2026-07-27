@@ -185,4 +185,103 @@ public class MatchingServiceTests
         // Then the out-of-state user does not appear, matching the "within your area" acceptance criteria
         Assert.Empty(candidates);
     }
+
+    // ── RecordSwipeAsync ──
+
+    [Fact]
+    public async Task RecordSwipeAsync_ALikeWithNoReciprocalLike_IsNotAMatch()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db);
+        var result = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        Assert.NotNull(result);
+        Assert.False(result!.IsMatch);
+        Assert.Equal(1, await db.Swipes.CountAsync());
+    }
+
+    [Fact]
+    public async Task RecordSwipeAsync_WhenBothProfilesLikeEachOther_IsAMatch()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db);
+
+        var bobLikesAlice = await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
+        Assert.False(bobLikesAlice!.IsMatch);
+
+        var aliceLikesBobBack = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        Assert.True(aliceLikesBobBack!.IsMatch);
+    }
+
+    [Fact]
+    public async Task RecordSwipeAsync_APassIsNeverAMatch_EvenIfTheOtherPersonLikedThem()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db);
+        await service.RecordSwipeAsync(bob.Id, alice.Id, liked: true);
+
+        var alicePassesOnBob = await service.RecordSwipeAsync(alice.Id, bob.Id, liked: false);
+
+        Assert.False(alicePassesOnBob!.IsMatch);
+    }
+
+    [Fact]
+    public async Task RecordSwipeAsync_SwipingTheSameProfileTwice_UpdatesTheExistingSwipeInsteadOfDuplicating()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        var bob = AddProfile(db, AddUser(db, "bob@example.com"), "Bob", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db);
+        await service.RecordSwipeAsync(alice.Id, bob.Id, liked: false);
+        await service.RecordSwipeAsync(alice.Id, bob.Id, liked: true);
+
+        Assert.Equal(1, await db.Swipes.CountAsync());
+        Assert.True((await db.Swipes.SingleAsync()).Liked);
+    }
+
+    [Fact]
+    public async Task RecordSwipeAsync_OnAProfileThatDoesNotExist_ReturnsNull()
+    {
+        await using var db = CreateContext();
+        var alice = AddProfile(db, AddUser(db, "alice@example.com"), "Alice", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db);
+        var result = await service.RecordSwipeAsync(alice.Id, targetProfileId: 999, liked: true);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetCandidatesAsync_ExcludesProfilesAlreadySwipedOn()
+    {
+        await using var db = CreateContext();
+        var requester = AddProfile(db, AddUser(db, "a@example.com"), "A", "GA", 1);
+        var alreadySwiped = AddProfile(db, AddUser(db, "b@example.com"), "B", "GA", 1);
+        var notYetSwiped = AddProfile(db, AddUser(db, "c@example.com"), "C", "GA", 1);
+        await db.SaveChangesAsync();
+
+        var service = new MatchingService(db);
+        await service.RecordSwipeAsync(requester.Id, alreadySwiped.Id, liked: true);
+
+        var candidates = await service.GetCandidatesAsync(requester.Id);
+
+        var candidate = Assert.Single(candidates);
+        Assert.Equal(notYetSwiped.Id, candidate.ProfileId);
+    }
 }

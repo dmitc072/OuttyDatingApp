@@ -21,6 +21,11 @@
             ContentTemplate="{DataTemplate views:HomePage}" />
 
         <ShellContent
+            Route="MatchingPage"
+            Title="Discover"
+            ContentTemplate="{DataTemplate views:MatchingPage}" />
+
+        <ShellContent
             x:Name="MessagesShellContent"
             Route="ConversationsPage"
             Title="Messages" />
