@@ -104,7 +104,7 @@ public partial class ProfilePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                "//CreateProfilePage");
+                nameof(CreateProfilePage));
         }
         catch (Exception ex)
         {
@@ -122,7 +122,7 @@ public partial class ProfilePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                "//SettingsPage");
+                nameof(SettingsPage));
         }
         catch (Exception ex)
         {
@@ -140,7 +140,7 @@ public partial class ProfilePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                "//HomePage");
+                $"///{nameof(HomePage)}");
         }
         catch (Exception ex)
         {

@@ -32,7 +32,7 @@ public partial class LoginPage : ContentPage
 
             await Shell.Current.GoToAsync(
                 loginResult.HasProfile
-                    ? nameof(HomePage)
+                    ? $"///{nameof(HomePage)}"
                     : nameof(CreateProfilePage));
         }
         catch (Exception ex)

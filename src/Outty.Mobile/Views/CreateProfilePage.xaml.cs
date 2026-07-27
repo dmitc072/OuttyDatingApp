@@ -836,7 +836,7 @@ public partial class CreateProfilePage : ContentPage
     {
         try
         {
-            await Shell.Current.GoToAsync("//HomePage");
+            await Shell.Current.GoToAsync($"///{nameof(HomePage)}");
         }
         catch
         {

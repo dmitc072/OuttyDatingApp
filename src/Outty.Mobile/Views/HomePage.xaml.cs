@@ -41,7 +41,7 @@ public partial class HomePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                nameof(ProfilePage));
+                $"///{nameof(ProfilePage)}");
         }
         catch (Exception ex)
         {
