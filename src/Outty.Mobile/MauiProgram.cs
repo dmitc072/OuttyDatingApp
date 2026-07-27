@@ -41,6 +41,16 @@ builder.Services.AddSingleton<
         builder.Services.AddTransient<ConversationsPage>();
         builder.Services.AddTransient<ChatPage>();
 
+        builder.Services.AddSingleton<GoogleAuthService>();
+        builder.Services.AddSingleton<ApiClient>();
+
+        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<CreateProfilePage>();
+        builder.Services.AddTransient<ProfilePage>();
+        builder.Services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<DeleteAccountPage>();
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif

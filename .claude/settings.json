@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --no-sandbox --print-to-pdf=/private/tmp/claude-501/-Users-duanemitchell-Documents-Coding-Kennesaw-State-University-SWE-6733-Emerg-Software-Eng-Processes-OuttyDatingApp/f1522eee-418c-4f38-8e2c-9d30382e87ee/scratchpad/Outty-Google-SignIn-Full-Code-Reference.pdf --no-pdf-header-footer file:///private/tmp/claude-501/-Users-duanemitchell-Documents-Coding-Kennesaw-State-University-SWE-6733-Emerg-Software-Eng-Processes-OuttyDatingApp/f1522eee-418c-4f38-8e2c-9d30382e87ee/scratchpad/oauth-full-code-reference.html)",
+      "Bash(cp /private/tmp/claude-501/-Users-duanemitchell-Documents-Coding-Kennesaw-State-University-SWE-6733-Emerg-Software-Eng-Processes-OuttyDatingApp/f1522eee-418c-4f38-8e2c-9d30382e87ee/scratchpad/Outty-Google-SignIn-Full-Code-Reference.pdf ~/Desktop/Outty-Google-SignIn-Full-Code-Reference.pdf)",
+      "Read(//Users/duanemitchell/Desktop/**)",
+      "Bash(az webapp *)",
+      "Bash(az keyvault *)",
+      "Bash(rm -rf /tmp/outty-api-publish)",
+      "Bash(dotnet publish *)",
+      "Bash(rm -f /tmp/outty-api-deploy.zip)",
+      "Bash(zip -r -q /tmp/outty-api-deploy.zip .)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --no-sandbox --print-to-pdf=/private/tmp/claude-501/-Users-duanemitchell-Documents-Coding-Kennesaw-State-University-SWE-6733-Emerg-Software-Eng-Processes-OuttyDatingApp/f1522eee-418c-4f38-8e2c-9d30382e87ee/scratchpad/Outty-Azure-Deployment-Guide.pdf --no-pdf-header-footer file:///private/tmp/claude-501/-Users-duanemitchell-Documents-Coding-Kennesaw-State-University-SWE-6733-Emerg-Software-Eng-Processes-OuttyDatingApp/f1522eee-418c-4f38-8e2c-9d30382e87ee/scratchpad/azure-deployment.html)",
+      "Bash(cp /private/tmp/claude-501/-Users-duanemitchell-Documents-Coding-Kennesaw-State-University-SWE-6733-Emerg-Software-Eng-Processes-OuttyDatingApp/f1522eee-418c-4f38-8e2c-9d30382e87ee/scratchpad/Outty-Azure-Deployment-Guide.pdf ~/Desktop/Outty-Azure-Deployment-Guide.pdf)",
+      "Bash(cd \"/Users/duanemitchell/Documents/Coding/Kennesaw State University/SWE 6733 Emerg Software Eng Processes/OuttyDatingApp\" && cp /tmp/merge-work/theirs.xaml.cs src/Outty.Mobile/Views/CreateProfilePage.xaml.cs && wc -l src/Outty.Mobile/Views/CreateProfilePage.xaml.cs)",
+      "Bash(echo \"exit: $?\")"
+    ],
+    "additionalDirectories": [
+      "/private/tmp/merge-work"
+    ]
+  }
+}

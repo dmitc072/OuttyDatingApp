@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using Microsoft.Maui.Media;
 using Microsoft.Maui.Storage;
+using Outty.Mobile.Services;
 
 namespace Outty.Mobile.Views;
 
@@ -10,13 +11,17 @@ public partial class CreateProfilePage : ContentPage
     private const int MaximumPhotos = 6;
     private const int MinimumAge = 18;
 
+    private readonly ApiClient _apiClient;
+
     private bool _isSaving;
 
     public ObservableCollection<ProfilePhoto> Photos { get; } = new();
 
-    public CreateProfilePage()
+    public CreateProfilePage(ApiClient apiClient)
     {
         InitializeComponent();
+
+        _apiClient = apiClient;
 
         BindingContext = this;
 
@@ -505,6 +510,43 @@ public partial class CreateProfilePage : ContentPage
                 return;
             }
 
+            int userId = Preferences.Default.Get("UserId", -1);
+
+            if (userId == -1)
+            {
+                await DisplayAlert(
+                    "Not Signed In",
+                    "You must be signed in before creating a profile.",
+                    "OK");
+
+                return;
+            }
+
+            try
+            {
+                await _apiClient.CreateProfileAsync(
+                    BuildCreateProfileRequest(
+                        userId,
+                        displayName,
+                        bio,
+                        city,
+                        state,
+                        zipCode,
+                        experienceLevel,
+                        dateOfBirth,
+                        searchRadius,
+                        selectedInterests));
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert(
+                    "Save Error",
+                    $"Your profile could not be saved to the server: {ex.Message}",
+                    "OK");
+
+                return;
+            }
+
             SaveProfileToPreferences(
                 displayName,
                 bio,
@@ -662,6 +704,40 @@ public partial class CreateProfilePage : ContentPage
         }
 
         return interests;
+    }
+
+    private static CreateProfileRequest BuildCreateProfileRequest(
+        int userId,
+        string displayName,
+        string bio,
+        string city,
+        string state,
+        string zipCode,
+        string experienceLevel,
+        DateTime dateOfBirth,
+        int searchRadius,
+        IReadOnlyCollection<string> interests)
+    {
+        // This page collects one experience level for the whole profile rather than
+        // per-interest, so the same level is applied to every selected interest here.
+        List<InterestSelection> interestSelections = interests
+            .Select(interestName =>
+                new InterestSelection(interestName, experienceLevel))
+            .ToList();
+
+        return new CreateProfileRequest(
+            UserId: userId,
+            DisplayName: displayName,
+            BirthDate: DateOnly.FromDateTime(dateOfBirth),
+            City: city,
+            State: state,
+            ZipCode: zipCode,
+            Pronouns: null,
+            Bio: bio,
+            PreferredDistance: string.Empty,
+            SearchRadiusMiles: searchRadius,
+            Interests: interestSelections,
+            Goals: []);
     }
 
     private void SaveProfileToPreferences(
