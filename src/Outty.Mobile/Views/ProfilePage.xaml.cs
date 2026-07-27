@@ -34,11 +34,6 @@ public partial class ProfilePage : ContentPage
                 "ProfileBio",
                 "No bio has been added yet.");
 
-        ExperienceLabel.Text =
-            Preferences.Default.Get(
-                "ProfileExperience",
-                "Not selected");
-
         DistanceLabel.Text =
             Preferences.Default.Get(
                 "ProfileDistance",
@@ -50,9 +45,7 @@ public partial class ProfilePage : ContentPage
                 "Not selected");
 
         InterestsLabel.Text =
-            Preferences.Default.Get(
-                "ProfileInterests",
-                "No interests selected.");
+            BuildInterestsText();
 
         var primaryPhotoPath =
             Preferences.Default.Get(
@@ -95,6 +88,29 @@ public partial class ProfilePage : ContentPage
         }
 
         return $"{city}, {state}";
+    }
+
+    private string BuildInterestsText()
+    {
+        var saved = Preferences.Default.Get("ProfileInterests", string.Empty);
+
+        if (string.IsNullOrWhiteSpace(saved))
+        {
+            return "No interests selected.";
+        }
+
+        // Stored as "Name:Level" pairs, e.g. "Hiking:Advance,Camping:Beginner".
+        var formatted = saved
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(entry =>
+            {
+                var parts = entry.Split(':', 2);
+                return parts.Length == 2
+                    ? $"{parts[0]} ({parts[1]})"
+                    : parts[0];
+            });
+
+        return string.Join(", ", formatted);
     }
 
     private async void OnEditProfileClicked(
