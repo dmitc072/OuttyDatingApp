@@ -74,14 +74,6 @@ public partial class CreateProfilePage : ContentPage
 
         SelectPickerItem(StatePicker, savedState);
 
-        string savedExperienceLevel = Preferences.Default.Get(
-            "ProfileExperienceLevel",
-            string.Empty);
-
-        SelectPickerItem(
-            ExperienceLevelPicker,
-            savedExperienceLevel);
-
         int savedRadius = Preferences.Default.Get(
             "SearchRadiusMiles",
             25);
@@ -123,21 +115,98 @@ public partial class CreateProfilePage : ContentPage
             "ProfileInterests",
             string.Empty);
 
-        HashSet<string> interests = savedInterests
+        // Stored as "Name:Level" pairs, e.g. "Hiking:Advance,Camping:Beginner".
+        Dictionary<string, string> savedLevelsByInterest = savedInterests
             .Split(
                 ',',
                 StringSplitOptions.RemoveEmptyEntries |
                 StringSplitOptions.TrimEntries)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            .Select(entry => entry.Split(':', 2))
+            .Where(parts => parts.Length == 2)
+            .ToDictionary(
+                parts => parts[0],
+                parts => parts[1],
+                StringComparer.OrdinalIgnoreCase);
 
-        HikingCheckBox.IsChecked = interests.Contains("Hiking");
-        CampingCheckBox.IsChecked = interests.Contains("Camping");
-        KayakingCheckBox.IsChecked = interests.Contains("Kayaking");
-        FishingCheckBox.IsChecked = interests.Contains("Fishing");
-        CyclingCheckBox.IsChecked = interests.Contains("Cycling");
-        RunningCheckBox.IsChecked = interests.Contains("Running");
-        ClimbingCheckBox.IsChecked = interests.Contains("Climbing");
-        OtherInterestCheckBox.IsChecked = interests.Contains("Other");
+        foreach ((CheckBox checkBox, Picker experiencePicker, string name) in GetInterestRows())
+        {
+            if (savedLevelsByInterest.TryGetValue(name, out string? level))
+            {
+                checkBox.IsChecked = true;
+                experiencePicker.IsVisible = true;
+                SelectPickerItem(experiencePicker, level);
+            }
+            else
+            {
+                checkBox.IsChecked = false;
+                experiencePicker.IsVisible = false;
+            }
+        }
+    }
+
+    private void OnInterestCheckedChanged(
+        object? sender,
+        CheckedChangedEventArgs e)
+    {
+        CheckBox? checkBox = sender as CheckBox;
+
+        foreach ((CheckBox rowCheckBox, Picker rowExperiencePicker, string _) in GetInterestRows())
+        {
+            if (ReferenceEquals(rowCheckBox, checkBox))
+            {
+                rowExperiencePicker.IsVisible = e.Value;
+
+                if (!e.Value)
+                {
+                    rowExperiencePicker.SelectedIndex = -1;
+                }
+
+                break;
+            }
+        }
+    }
+
+    private (CheckBox CheckBox, Picker ExperiencePicker, string Name)[] GetInterestRows()
+    {
+        return
+        [
+            (HikingCheckBox, HikingExperiencePicker, "Hiking"),
+            (CampingCheckBox, CampingExperiencePicker, "Camping"),
+            (KayakingCheckBox, KayakingExperiencePicker, "Kayaking"),
+            (FishingCheckBox, FishingExperiencePicker, "Fishing"),
+            (CyclingCheckBox, CyclingExperiencePicker, "Cycling"),
+            (RunningCheckBox, RunningExperiencePicker, "Running"),
+            (ClimbingCheckBox, ClimbingExperiencePicker, "Climbing"),
+            (OtherInterestCheckBox, OtherInterestExperiencePicker, "Other")
+        ];
+    }
+
+    private List<(string Name, string Level)> GetSelectedInterestsWithLevels()
+    {
+        List<(string Name, string Level)> selections = new();
+
+        foreach ((CheckBox checkBox, Picker experiencePicker, string name) in GetInterestRows())
+        {
+            if (checkBox.IsChecked)
+            {
+                selections.Add((name, experiencePicker.SelectedItem?.ToString() ?? string.Empty));
+            }
+        }
+
+        return selections;
+    }
+
+    private bool AllSelectedInterestsHaveLevel()
+    {
+        foreach ((CheckBox checkBox, Picker experiencePicker, string _) in GetInterestRows())
+        {
+            if (checkBox.IsChecked && experiencePicker.SelectedIndex == -1)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void LoadSavedPhotos()
@@ -462,12 +531,6 @@ public partial class CreateProfilePage : ContentPage
             string zipCode =
                 ZipCodeEntry.Text?.Trim() ?? string.Empty;
 
-            string experienceLevel =
-                ExperienceLevelPicker.SelectedItem
-                    ?.ToString()
-                    ?.Trim()
-                ?? string.Empty;
-
             DateTime? selectedDateOfBirth =
                 DateOfBirthPicker.Date;
 
@@ -487,8 +550,8 @@ public partial class CreateProfilePage : ContentPage
             int searchRadius =
                 (int)Math.Round(SearchRadiusSlider.Value);
 
-            List<string> selectedInterests =
-                GetSelectedInterests();
+            List<(string Name, string Level)> selectedInterests =
+                GetSelectedInterestsWithLevels();
 
             string? validationMessage = ValidateProfile(
                 displayName,
@@ -496,7 +559,6 @@ public partial class CreateProfilePage : ContentPage
                 city,
                 state,
                 zipCode,
-                experienceLevel,
                 dateOfBirth,
                 selectedInterests);
 
@@ -505,6 +567,16 @@ public partial class CreateProfilePage : ContentPage
                 await DisplayAlert(
                     "Profile Incomplete",
                     validationMessage,
+                    "OK");
+
+                return;
+            }
+
+            if (!AllSelectedInterestsHaveLevel())
+            {
+                await DisplayAlert(
+                    "Profile Incomplete",
+                    "Please select an experience level for each checked interest.",
                     "OK");
 
                 return;
@@ -532,7 +604,6 @@ public partial class CreateProfilePage : ContentPage
                         city,
                         state,
                         zipCode,
-                        experienceLevel,
                         dateOfBirth,
                         searchRadius,
                         selectedInterests));
@@ -553,7 +624,6 @@ public partial class CreateProfilePage : ContentPage
                 city,
                 state,
                 zipCode,
-                experienceLevel,
                 dateOfBirth,
                 searchRadius,
                 selectedInterests);
@@ -585,9 +655,8 @@ public partial class CreateProfilePage : ContentPage
         string city,
         string state,
         string zipCode,
-        string experienceLevel,
         DateTime dateOfBirth,
-        IReadOnlyCollection<string> interests)
+        IReadOnlyCollection<(string Name, string Level)> interests)
     {
         if (string.IsNullOrWhiteSpace(displayName))
         {
@@ -624,11 +693,6 @@ public partial class CreateProfilePage : ContentPage
             return "Please enter a valid five-digit ZIP Code.";
         }
 
-        if (string.IsNullOrWhiteSpace(experienceLevel))
-        {
-            return "Please select your outdoor experience level.";
-        }
-
         if (interests.Count == 0)
         {
             return "Please select at least one outdoor interest.";
@@ -659,53 +723,6 @@ public partial class CreateProfilePage : ContentPage
                zipCode.All(char.IsDigit);
     }
 
-    private List<string> GetSelectedInterests()
-    {
-        List<string> interests = new();
-
-        if (HikingCheckBox.IsChecked)
-        {
-            interests.Add("Hiking");
-        }
-
-        if (CampingCheckBox.IsChecked)
-        {
-            interests.Add("Camping");
-        }
-
-        if (KayakingCheckBox.IsChecked)
-        {
-            interests.Add("Kayaking");
-        }
-
-        if (FishingCheckBox.IsChecked)
-        {
-            interests.Add("Fishing");
-        }
-
-        if (CyclingCheckBox.IsChecked)
-        {
-            interests.Add("Cycling");
-        }
-
-        if (RunningCheckBox.IsChecked)
-        {
-            interests.Add("Running");
-        }
-
-        if (ClimbingCheckBox.IsChecked)
-        {
-            interests.Add("Climbing");
-        }
-
-        if (OtherInterestCheckBox.IsChecked)
-        {
-            interests.Add("Other");
-        }
-
-        return interests;
-    }
-
     private static CreateProfileRequest BuildCreateProfileRequest(
         int userId,
         string displayName,
@@ -713,16 +730,13 @@ public partial class CreateProfilePage : ContentPage
         string city,
         string state,
         string zipCode,
-        string experienceLevel,
         DateTime dateOfBirth,
         int searchRadius,
-        IReadOnlyCollection<string> interests)
+        IReadOnlyCollection<(string Name, string Level)> interests)
     {
-        // This page collects one experience level for the whole profile rather than
-        // per-interest, so the same level is applied to every selected interest here.
         List<InterestSelection> interestSelections = interests
-            .Select(interestName =>
-                new InterestSelection(interestName, experienceLevel))
+            .Select(interest =>
+                new InterestSelection(interest.Name, interest.Level))
             .ToList();
 
         return new CreateProfileRequest(
@@ -746,10 +760,9 @@ public partial class CreateProfilePage : ContentPage
         string city,
         string state,
         string zipCode,
-        string experienceLevel,
         DateTime dateOfBirth,
         int searchRadius,
-        IReadOnlyCollection<string> interests)
+        IReadOnlyCollection<(string Name, string Level)> interests)
     {
         Preferences.Default.Set(
             "ProfileDisplayName",
@@ -776,12 +789,10 @@ public partial class CreateProfilePage : ContentPage
             zipCode);
 
         Preferences.Default.Set(
-            "ProfileExperienceLevel",
-            experienceLevel);
-
-        Preferences.Default.Set(
             "ProfileInterests",
-            string.Join(",", interests));
+            string.Join(
+                ",",
+                interests.Select(interest => $"{interest.Name}:{interest.Level}")));
 
         Preferences.Default.Set(
             "SearchRadiusMiles",

@@ -324,137 +324,177 @@
                             TextColor="{AppThemeBinding Light=#1E1E1E, Dark=White}" />
 
                         <Label
-                            Text="Experience Level"
-                            FontAttributes="Bold" />
-
-                        <Picker
-                            x:Name="ExperienceLevelPicker"
-                            Title="Select your experience level">
-
-                            <Picker.Items>
-                                <x:String>Beginner</x:String>
-                                <x:String>Intermediate</x:String>
-                                <x:String>Advanced</x:String>
-                                <x:String>Expert</x:String>
-                            </Picker.Items>
-
-                        </Picker>
-
-                        <Label
                             Text="Select Your Interests"
                             FontAttributes="Bold" />
 
-                        <Grid
-                            ColumnDefinitions="*,*"
-                            RowDefinitions="Auto,Auto,Auto,Auto"
-                            ColumnSpacing="14"
-                            RowSpacing="8">
+                        <Label
+                            Text="Check an activity and set your experience level for it"
+                            FontSize="12"
+                            TextColor="{AppThemeBinding Light=#727B74, Dark=#AAAAAA}" />
 
-                            <HorizontalStackLayout
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Spacing="8">
+                        <VerticalStackLayout Spacing="14">
 
-                                <CheckBox x:Name="HikingCheckBox" />
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="HikingCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Hiking" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="HikingExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                                <Label
-                                    Text="Hiking"
-                                    VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="CampingCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Camping" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="CampingExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                            </HorizontalStackLayout>
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="KayakingCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Kayaking" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="KayakingExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                            <HorizontalStackLayout
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Spacing="8">
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="FishingCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Fishing" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="FishingExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                                <CheckBox x:Name="CampingCheckBox" />
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="CyclingCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Cycling" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="CyclingExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                                <Label
-                                    Text="Camping"
-                                    VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="RunningCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Running" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="RunningExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                            </HorizontalStackLayout>
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="ClimbingCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Climbing" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="ClimbingExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                            <HorizontalStackLayout
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Spacing="8">
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <CheckBox
+                                        x:Name="OtherInterestCheckBox"
+                                        CheckedChanged="OnInterestCheckedChanged" />
+                                    <Label Text="Other" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Picker
+                                    x:Name="OtherInterestExperiencePicker"
+                                    IsVisible="False"
+                                    MinimumHeightRequest="44"
+                                    Title="Experience level">
+                                    <Picker.Items>
+                                        <x:String>Beginner</x:String>
+                                        <x:String>Intermediate</x:String>
+                                        <x:String>Advance</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </VerticalStackLayout>
 
-                                <CheckBox x:Name="KayakingCheckBox" />
-
-                                <Label
-                                    Text="Kayaking"
-                                    VerticalOptions="Center" />
-
-                            </HorizontalStackLayout>
-
-                            <HorizontalStackLayout
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Spacing="8">
-
-                                <CheckBox x:Name="FishingCheckBox" />
-
-                                <Label
-                                    Text="Fishing"
-                                    VerticalOptions="Center" />
-
-                            </HorizontalStackLayout>
-
-                            <HorizontalStackLayout
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Spacing="8">
-
-                                <CheckBox x:Name="CyclingCheckBox" />
-
-                                <Label
-                                    Text="Cycling"
-                                    VerticalOptions="Center" />
-
-                            </HorizontalStackLayout>
-
-                            <HorizontalStackLayout
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                Spacing="8">
-
-                                <CheckBox x:Name="RunningCheckBox" />
-
-                                <Label
-                                    Text="Running"
-                                    VerticalOptions="Center" />
-
-                            </HorizontalStackLayout>
-
-                            <HorizontalStackLayout
-                                Grid.Row="3"
-                                Grid.Column="0"
-                                Spacing="8">
-
-                                <CheckBox x:Name="ClimbingCheckBox" />
-
-                                <Label
-                                    Text="Climbing"
-                                    VerticalOptions="Center" />
-
-                            </HorizontalStackLayout>
-
-                            <HorizontalStackLayout
-                                Grid.Row="3"
-                                Grid.Column="1"
-                                Spacing="8">
-
-                                <CheckBox x:Name="OtherInterestCheckBox" />
-
-                                <Label
-                                    Text="Other"
-                                    VerticalOptions="Center" />
-
-                            </HorizontalStackLayout>
-
-                        </Grid>
+                        </VerticalStackLayout>
 
                     </VerticalStackLayout>
 
