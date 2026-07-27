@@ -14,10 +14,10 @@
 
 **Sprint 2 actual velocity:**
 
-| Measure | Points | What it counts |
-|---|---|---|
-| Committed-and-finished (strict) | 3 pts | US-12 only — the one story fully completed that was actually committed to Sprint 2 |
-| Total shipped (all work) | 16 pts | 3 pts (US-12) + 13 pts Sprint 1 carryover (US-01–US-04) finished this week |
+| Measure                         | Points | What it counts                                                                     |
+| ------------------------------- | ------ | ---------------------------------------------------------------------------------- |
+| Committed-and-finished (strict) | 3 pts  | US-12 only — the one story fully completed that was actually committed to Sprint 2 |
+| Total shipped (all work)        | 16 pts | 3 pts (US-12) + 13 pts Sprint 1 carryover (US-01–US-04) finished this week         |
 
 ### Applying Yesterday's Weather honestly
 
@@ -30,15 +30,16 @@ Strictly applied, Yesterday's Weather says: forecast what you actually finished 
 
 Rather than re-committing to all 14 points of Sprint 2's unfinished work (repeating the overcommitment), Sprint 3 commits to **half of it** — the two stories that form the matching engine's backend, sequenced to unblock Sprint 4's UI work:
 
-| ID | Story | Points |
-|---|---|---|
-| US-11 | Matching Algorithm | 5 |
-| US-08 | Set Search Radius | 2 |
-| **Total** | | **7 pts** |
+| ID        | Story               | Points     |
+| --------- | ------------------- | ---------- |
+| US-11     | Matching Algorithm  | 5          |
+| US-08     | Set Search Radius   | 2          |
+| US-10     | Swipe Left/Right UI | 5          |
+| **Total** |                     | **12 pts** |
 
-**US-09 (Set Availability, 2 pts) and US-10 (Swipe Left/Right UI, 5 pts) are deliberately deferred to Sprint 4.** This isn't scope-cutting for its own sake — US-10 (the swipe UI) needs a real candidates endpoint to swipe *through*. Building it before US-11 exists means building against fake data and rewiring it later. Doing the matching backend first is the logical dependency order, not just a smaller number.
+**US-09 (Set Availability, 2 pts) is deliberately deferred to Sprint 4.**
 
-**Rationale for the 7-point number specifically:** it sits between the two Yesterday's Weather extremes (3 and 16), matches exactly two stories the team can commit to *end-to-end* rather than spreading effort across four again, and splits the remaining 14 points of matching-engine work evenly across the two sprints left (7 this sprint, 7 next) instead of front- or back-loading it.
+**Rationale for the 7-point number specifically:** it sits between the two Yesterday's Weather extremes (3 and 16), matches exactly two stories the team can commit to _end-to-end_ rather than spreading effort across four again, and splits the remaining 14 points of matching-engine work evenly across the two sprints left (7 this sprint, 7 next) instead of front- or back-loading it.
 
 ---
 
@@ -46,23 +47,23 @@ Rather than re-committing to all 14 points of Sprint 2's unfinished work (repeat
 
 ### US-08 — Set Search Radius (2 pts) — Backend Done, UI Pending
 
-| Task | Owner | Estimate | Status |
-|---|---|---|---|
-| Add `SearchRadiusMiles` validation logic (5–100 miles, default 25) as a testable unit in `Outty.Shared` | Duane | 1h | Done |
-| Add `dbo.Profiles.SearchRadiusMiles` column via `db/schema.sql`, re-scaffold EF models | Duane | 1h | Done |
-| Add search radius slider (5–100 miles) to `PreferencesPage.xaml`, defaulting to 25 | Yamani | 1h | To Do |
-| Wire the slider to save via the API (`PUT /profiles/{id}/search-radius` now exists) | Jazmin | 1h | To Do |
-| Unit tests for radius validation (below min, above max, default, boundaries) | Duane | 1h | Done |
+| Task                                                                                                    | Owner  | Estimate | Status |
+| ------------------------------------------------------------------------------------------------------- | ------ | -------- | ------ |
+| Add `SearchRadiusMiles` validation logic (5–100 miles, default 25) as a testable unit in `Outty.Shared` | Duane  | 1h       | Done   |
+| Add `dbo.Profiles.SearchRadiusMiles` column via `db/schema.sql`, re-scaffold EF models                  | Duane  | 1h       | Done   |
+| Add search radius slider (5–100 miles) to `PreferencesPage.xaml`, defaulting to 25                      | Jazmin | 1h       | To Do  |
+| Wire the slider to save via the API (`PUT /profiles/{id}/search-radius` now exists)                     | Jazmin | 1h       | To Do  |
+| Unit tests for radius validation (below min, above max, default, boundaries)                            | Duane  | 1h       | Done   |
 
 ### US-11 — Matching Algorithm (5 pts) — Backend Done, UI Pending
 
-| Task | Owner | Estimate | Status |
-|---|---|---|---|
-| Implement `MatchingService.GetCandidates()` — filters by shared interests + state, excludes self | Duane | 3h | Done |
-| Expose `GET /matches/candidates/{profileId}` endpoint in `Outty.Api` | Duane | 1h | Done |
-| Unit tests for `MatchingService` filter logic (shared/no shared interests, self-exclusion, empty results, ordering) | Duane | 2h | Done |
-| BDD/A-TDD tests: acceptance criteria for shared-interest matching and out-of-state exclusion | Duane | 1h | Done |
-| Connect `SwipePage` scaffold to the candidates endpoint (stub UI acceptable — full swipe UI is Sprint 4/US-10) | Yamani | 2h | To Do |
+| Task                                                                                                                | Owner  | Estimate | Status |
+| ------------------------------------------------------------------------------------------------------------------- | ------ | -------- | ------ |
+| Implement `MatchingService.GetCandidates()` — filters by shared interests + state, excludes self                    | Duane  | 3h       | Done   |
+| Expose `GET /matches/candidates/{profileId}` endpoint in `Outty.Api`                                                | Duane  | 1h       | Done   |
+| Unit tests for `MatchingService` filter logic (shared/no shared interests, self-exclusion, empty results, ordering) | Duane  | 2h       | Done   |
+| BDD/A-TDD tests: acceptance criteria for shared-interest matching and out-of-state exclusion                        | Duane  | 1h       | Done   |
+| Connect `SwipePage` scaffold to the candidates endpoint (stub UI acceptable — full swipe UI is Sprint 4/US-10)      | Yamani | 2h       | To Do  |
 
 > Design reference: [Discover screen](../design.md#discover)
 
@@ -71,6 +72,12 @@ Rather than re-committing to all 14 points of Sprint 2's unfinished work (repeat
 ## Kanban Board
 
 **GitHub Projects Board URL:** https://github.com/users/dmitc072/projects/3
+
+### Kanban Board Snapshot
+
+![Sprint 3 Kanban](images/sprint3-kanban.png)
+
+> The live GitHub Project board is linked above. This snapshot captures the Sprint 3 board at the time of submission.
 
 ---
 
@@ -85,3 +92,11 @@ A story is done when:
 - [ ] Code committed and pushed to the team's GitHub repository
 - [ ] No critical bugs on the happy path
 - [ ] Demoed to at least one other team member
+
+---
+
+## Additional Sprint Artifacts
+
+- Burndown Chart: `burndown.md`
+- Pair Programming / Mobbing Evidence: `pairing.md`
+- Sprint Review and Retrospective: `sprint-review-retro.md`
