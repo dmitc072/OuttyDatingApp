@@ -90,7 +90,7 @@ public partial class SettingsPage : ContentPage
         EventArgs e)
     {
         await NavigateAsync(
-            "//ProfilePage",
+            "//MainTabs/ProfilePage",
             "Unable to open your profile.");
     }
 
@@ -99,7 +99,7 @@ public partial class SettingsPage : ContentPage
         EventArgs e)
     {
         await NavigateAsync(
-            "//CreateProfilePage",
+            nameof(CreateProfilePage),
             "Unable to open the profile editor.");
     }
 
@@ -108,7 +108,7 @@ public partial class SettingsPage : ContentPage
         EventArgs e)
     {
         await NavigateAsync(
-            "//DeleteAccountPage",
+            nameof(DeleteAccountPage),
             "Unable to open the delete account page.");
     }
 
@@ -144,7 +144,8 @@ public partial class SettingsPage : ContentPage
                 return;
             }
 
-            await Shell.Current.GoToAsync("//HomePage");
+            await Shell.Current.GoToAsync(
+                "//MainTabs/HomePage");
         }
         catch (Exception ex)
         {

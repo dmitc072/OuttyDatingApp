@@ -10,11 +10,31 @@
     <ShellContent
         Route="LoginPage"
         Title="Login"
-        ContentTemplate="{DataTemplate views:LoginPage}" />
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Shell.TabBarIsVisible="False" />
 
-    <ShellContent
-        Route="HomePage"
-        Title="Home"
-        ContentTemplate="{DataTemplate views:HomePage}" />
+    <TabBar Route="MainTabs">
+
+        <ShellContent
+            Route="HomePage"
+            Title="Home"
+            ContentTemplate="{DataTemplate views:HomePage}" />
+
+        <ShellContent
+            Route="MatchingPage"
+            Title="Discover"
+            ContentTemplate="{DataTemplate views:MatchingPage}" />
+
+        <ShellContent
+            x:Name="MessagesShellContent"
+            Route="ConversationsPage"
+            Title="Messages" />
+            
+        <ShellContent
+            Route="ProfilePage"
+            Title="Profile"
+            ContentTemplate="{DataTemplate views:ProfilePage}" />
+
+    </TabBar>
 
 </Shell>

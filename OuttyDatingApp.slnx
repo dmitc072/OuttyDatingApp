@@ -4,4 +4,8 @@
     <Project Path="src/Outty.Mobile/Outty.Mobile.csproj" />
     <Project Path="src/Outty.Shared/Outty.Shared.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Outty.Shared.Tests/Outty.Shared.Tests.csproj" />
+    <Project Path="tests/Outty.Api.Tests/Outty.Api.Tests.csproj" />
+  </Folder>
 </Solution>

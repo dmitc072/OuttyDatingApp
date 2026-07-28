@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="Outty.Mobile.Views.MatchesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Your Matches"
+    BackgroundColor="{AppThemeBinding Light=#F7F7F7, Dark=#121212}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Page Header -->
+        <Grid
+            Grid.Row="0"
+            Padding="20,16"
+            BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+            ColumnDefinitions="*,Auto">
+
+            <VerticalStackLayout Spacing="2">
+
+                <Label
+                    Text="Your Matches"
+                    FontSize="26"
+                    FontAttributes="Bold"
+                    TextColor="{AppThemeBinding Light=#1E1E1E, Dark=White}" />
+
+                <Label
+                    Text="Everyone you and your adventure buddy both liked."
+                    FontSize="14"
+                    TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}" />
+
+            </VerticalStackLayout>
+
+        </Grid>
+
+        <Grid Grid.Row="1" Padding="20">
+
+            <!-- Loading State -->
+            <VerticalStackLayout
+                x:Name="LoadingLayout"
+                VerticalOptions="Center"
+                Spacing="12"
+                IsVisible="True">
+
+                <ActivityIndicator IsRunning="True" Color="#2E7D32" />
+
+                <Label
+                    Text="Loading your matches..."
+                    HorizontalTextAlignment="Center"
+                    TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}" />
+
+            </VerticalStackLayout>
+
+            <!-- Empty State -->
+            <VerticalStackLayout
+                x:Name="EmptyLayout"
+                VerticalOptions="Center"
+                Spacing="10"
+                IsVisible="False">
+
+                <Label
+                    Text="💚"
+                    FontSize="48"
+                    HorizontalTextAlignment="Center" />
+
+                <Label
+                    Text="No matches yet"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    HorizontalTextAlignment="Center"
+                    TextColor="{AppThemeBinding Light=#1E1E1E, Dark=White}" />
+
+                <Label
+                    Text="Keep swiping on Discover — when you both like each other, they'll show up here."
+                    FontSize="14"
+                    HorizontalTextAlignment="Center"
+                    TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}" />
+
+            </VerticalStackLayout>
+
+            <!-- Matches List -->
+            <RefreshView
+                x:Name="MatchesRefreshView"
+                Command="{Binding RefreshCommand}"
+                IsRefreshing="{Binding IsRefreshing}"
+                IsVisible="False">
+
+                <CollectionView
+                    x:Name="MatchesCollectionView"
+                    ItemsSource="{Binding Matches}"
+                    SelectionMode="None">
+
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+
+                            <Border
+                                Padding="16"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        CommandParameter="{Binding .}"
+                                        Tapped="OnMatchTapped" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+
+                                    <Border
+                                        Grid.Column="0"
+                                        WidthRequest="52"
+                                        HeightRequest="52"
+                                        Padding="0"
+                                        StrokeShape="RoundRectangle 26"
+                                        Stroke="Transparent"
+                                        BackgroundColor="{AppThemeBinding Light=#E8F5E9, Dark=#1B3B22}">
+
+                                        <Label
+                                            Text="🌲"
+                                            FontSize="24"
+                                            HorizontalOptions="Center"
+                                            VerticalOptions="Center" />
+
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+
+                                        <Label
+                                            Text="{Binding DisplayName}"
+                                            FontSize="17"
+                                            FontAttributes="Bold"
+                                            TextColor="{AppThemeBinding Light=#1E1E1E, Dark=White}" />
+
+                                        <Label
+                                            FontSize="13"
+                                            TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="{}{0}, {1}">
+                                                    <Binding Path="City" />
+                                                    <Binding Path="State" />
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+
+                                    </VerticalStackLayout>
+
+                                    <Label
+                                        Grid.Column="2"
+                                        Text="💬"
+                                        FontSize="22"
+                                        VerticalOptions="Center" />
+
+                                </Grid>
+
+                            </Border>
+
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </RefreshView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

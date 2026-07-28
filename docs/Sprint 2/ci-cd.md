@@ -28,7 +28,7 @@ We chose GitHub Actions as our CI tool for the following reasons:
 
 **File location in repo:** `.github/workflows/main.yml`
 
-> The workflow restores/builds the full `OuttyDatingApp.slnx`, including `Outty.Mobile` (.NET MAUI, Android target). Since `ubuntu-latest` doesn't ship the MAUI SDK workload by default, a dedicated step installs it (`dotnet workload install maui-android`) before restore. This adds a few minutes to every run — worth it once Mobile code is actively changing; `dotnet test` still only targets `Outty.Api` since that's the only project with tests.
+> The workflow restores/builds the full `OuttyDatingApp.slnx`, including `Outty.Mobile` (.NET MAUI, Android target). Since `ubuntu-latest` doesn't ship the MAUI SDK workload by default, a dedicated step installs it (`dotnet workload install maui-android`) before restore. This adds a few minutes to every run — worth it once Mobile code is actively changing; `dotnet test` targets `tests/Outty.Shared.Tests`, the project holding the test suite (see `tests.md`).
 
 ```yaml
 name: Outty CI
@@ -62,7 +62,7 @@ jobs:
         run: dotnet build OuttyDatingApp.slnx --no-restore --configuration Release
 
       - name: Run all tests
-        run: dotnet test src/Outty.Api/Outty.Api.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test tests/Outty.Shared.Tests/Outty.Shared.Tests.csproj --no-build --configuration Release --verbosity normal
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -109,7 +109,13 @@ If any step fails, GitHub marks the commit with a red ✗ and sends an email not
 
 ---
 
-## Optional: Continuous Deployment (CD)
+## Deployment
+
+**`Outty.Api` is live:** https://outty-api.azurewebsites.net (App Service `outty-api`, plan `outty-asp`, `Outty-RG` resource group, Central US, B1 tier). Deployed manually via `az webapp deploy` (zip deploy) on 2026-07-27 — not yet wired into CI as automatic CD. The `/swagger` / OpenAPI UI is not available on this deployment since `app.MapOpenApi()` is gated behind `IsDevelopment()` and the App Service runs in the `Production` environment by default; hit the real endpoints directly instead (e.g. `GET /states`).
+
+The App Service authenticates to Key Vault via a **system-assigned managed identity** (granted the `Key Vault Secrets User` role on `outty-kv`) — `DefaultAzureCredential` in `Program.cs` picks this up automatically when running in Azure, no connection-string secret needed in App Service config. Azure SQL's `AllowAzureServices` firewall rule already permits the App Service to reach `outty-sql-srv1` without additional firewall changes.
+
+### Automating this via CI (optional, not yet set up)
 
 To also auto-deploy to Azure App Service on every successful CI run, add this job to the workflow after the test job:
 
@@ -146,5 +152,3 @@ deploy-to-azure:
 3. Name: `AZURE_WEBAPP_PUBLISH_PROFILE`, Value: paste the downloaded file contents
 4. Add the deploy job above to your workflow YAML
 5. Push to main — CI runs tests, then CD deploys to Azure automatically
-
-**Live API URL after CD setup:** https://outty-api.azurewebsites.net/swagger

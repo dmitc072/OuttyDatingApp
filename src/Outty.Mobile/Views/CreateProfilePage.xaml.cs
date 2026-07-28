@@ -1,91 +1,332 @@
 using System.Collections.ObjectModel;
-using Outty.Mobile.Models;
+using System.Text.Json;
+using Microsoft.Maui.Media;
+using Microsoft.Maui.Storage;
+using Outty.Mobile.Services;
 
 namespace Outty.Mobile.Views;
 
 public partial class CreateProfilePage : ContentPage
 {
     private const int MaximumPhotos = 6;
+    private const int MinimumAge = 18;
 
-    public ObservableCollection<ProfilePhoto> Photos { get; } = [];
+    private readonly ApiClient _apiClient;
 
-    public CreateProfilePage()
+    private bool _isSaving;
+
+    public ObservableCollection<ProfilePhoto> Photos { get; } = new();
+
+    public CreateProfilePage(ApiClient apiClient)
     {
         InitializeComponent();
 
+        _apiClient = apiClient;
+
         BindingContext = this;
 
-        BirthDatePicker.MaximumDate = DateTime.Today;
-        BirthDatePicker.MinimumDate = DateTime.Today.AddYears(-100);
-        BirthDatePicker.Date = DateTime.Today.AddYears(-18);
-
-        UpdateAgeLabel();
-        UpdatePhotoCount();
+        ConfigureDatePicker();
+        LoadSavedProfile();
     }
 
-    private async void OnChoosePhotosClicked(
-        object? sender,
-        EventArgs e)
+    private void ConfigureDatePicker()
     {
-        ClearError();
+        DateTime today = DateTime.Today;
 
-        if (Photos.Count >= MaximumPhotos)
+        DateOfBirthPicker.MaximumDate = today.AddYears(-MinimumAge);
+        DateOfBirthPicker.MinimumDate = today.AddYears(-100);
+
+        string savedDateOfBirth = Preferences.Default.Get(
+            "ProfileDateOfBirth",
+            string.Empty);
+
+        if (DateTime.TryParse(savedDateOfBirth, out DateTime savedDate))
         {
-            ShowError(
-                $"You may upload a maximum of {MaximumPhotos} photos.");
+            DateOfBirthPicker.Date = savedDate;
+        }
+        else
+        {
+            DateOfBirthPicker.Date = today.AddYears(-MinimumAge);
+        }
+    }
 
+    private void LoadSavedProfile()
+    {
+        DisplayNameEntry.Text = Preferences.Default.Get(
+            "ProfileDisplayName",
+            string.Empty);
+
+        BioEditor.Text = Preferences.Default.Get(
+            "ProfileBio",
+            string.Empty);
+
+        CityEntry.Text = Preferences.Default.Get(
+            "ProfileCity",
+            string.Empty);
+
+        ZipCodeEntry.Text = Preferences.Default.Get(
+            "ProfileZipCode",
+            string.Empty);
+
+        string savedState = Preferences.Default.Get(
+            "ProfileState",
+            string.Empty);
+
+        SelectPickerItem(StatePicker, savedState);
+
+        int savedRadius = Preferences.Default.Get(
+            "SearchRadiusMiles",
+            25);
+
+        savedRadius = Math.Clamp(savedRadius, 5, 100);
+
+        SearchRadiusSlider.Value = savedRadius;
+        SearchRadiusLabel.Text = $"{savedRadius} miles";
+
+        LoadSavedInterests();
+        LoadSavedPhotos();
+    }
+
+    private static void SelectPickerItem(
+        Picker picker,
+        string savedValue)
+    {
+        if (string.IsNullOrWhiteSpace(savedValue))
+        {
+            return;
+        }
+
+        for (int index = 0; index < picker.Items.Count; index++)
+        {
+            if (string.Equals(
+                    picker.Items[index],
+                    savedValue,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                picker.SelectedIndex = index;
+                return;
+            }
+        }
+    }
+
+    private void LoadSavedInterests()
+    {
+        string savedInterests = Preferences.Default.Get(
+            "ProfileInterests",
+            string.Empty);
+
+        // Stored as "Name:Level" pairs, e.g. "Hiking:Advance,Camping:Beginner".
+        Dictionary<string, string> savedLevelsByInterest = savedInterests
+            .Split(
+                ',',
+                StringSplitOptions.RemoveEmptyEntries |
+                StringSplitOptions.TrimEntries)
+            .Select(entry => entry.Split(':', 2))
+            .Where(parts => parts.Length == 2)
+            .ToDictionary(
+                parts => parts[0],
+                parts => parts[1],
+                StringComparer.OrdinalIgnoreCase);
+
+        foreach ((CheckBox checkBox, Picker experiencePicker, string name) in GetInterestRows())
+        {
+            if (savedLevelsByInterest.TryGetValue(name, out string? level))
+            {
+                checkBox.IsChecked = true;
+                experiencePicker.IsVisible = true;
+                SelectPickerItem(experiencePicker, level);
+            }
+            else
+            {
+                checkBox.IsChecked = false;
+                experiencePicker.IsVisible = false;
+            }
+        }
+    }
+
+    private void OnInterestCheckedChanged(
+        object? sender,
+        CheckedChangedEventArgs e)
+    {
+        CheckBox? checkBox = sender as CheckBox;
+
+        foreach ((CheckBox rowCheckBox, Picker rowExperiencePicker, string _) in GetInterestRows())
+        {
+            if (ReferenceEquals(rowCheckBox, checkBox))
+            {
+                rowExperiencePicker.IsVisible = e.Value;
+
+                if (!e.Value)
+                {
+                    rowExperiencePicker.SelectedIndex = -1;
+                }
+
+                break;
+            }
+        }
+    }
+
+    private (CheckBox CheckBox, Picker ExperiencePicker, string Name)[] GetInterestRows()
+    {
+        return
+        [
+            (HikingCheckBox, HikingExperiencePicker, "Hiking"),
+            (CampingCheckBox, CampingExperiencePicker, "Camping"),
+            (KayakingCheckBox, KayakingExperiencePicker, "Kayaking"),
+            (FishingCheckBox, FishingExperiencePicker, "Fishing"),
+            (CyclingCheckBox, CyclingExperiencePicker, "Cycling"),
+            (RunningCheckBox, RunningExperiencePicker, "Running"),
+            (ClimbingCheckBox, ClimbingExperiencePicker, "Climbing"),
+            (OtherInterestCheckBox, OtherInterestExperiencePicker, "Other")
+        ];
+    }
+
+    private List<(string Name, string Level)> GetSelectedInterestsWithLevels()
+    {
+        List<(string Name, string Level)> selections = new();
+
+        foreach ((CheckBox checkBox, Picker experiencePicker, string name) in GetInterestRows())
+        {
+            if (checkBox.IsChecked)
+            {
+                selections.Add((name, experiencePicker.SelectedItem?.ToString() ?? string.Empty));
+            }
+        }
+
+        return selections;
+    }
+
+    private bool AllSelectedInterestsHaveLevel()
+    {
+        foreach ((CheckBox checkBox, Picker experiencePicker, string _) in GetInterestRows())
+        {
+            if (checkBox.IsChecked && experiencePicker.SelectedIndex == -1)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void LoadSavedPhotos()
+    {
+        Photos.Clear();
+
+        string savedPhotoJson = Preferences.Default.Get(
+            "ProfilePhotos",
+            string.Empty);
+
+        if (string.IsNullOrWhiteSpace(savedPhotoJson))
+        {
+            LoadLegacyPrimaryPhoto();
             return;
         }
 
         try
         {
-            var selectedPhotos =
-                await MediaPicker.Default.PickPhotosAsync(
-                    new MediaPickerOptions
-                    {
-                        Title = "Select profile photos"
-                    });
+            List<string>? savedPaths =
+                JsonSerializer.Deserialize<List<string>>(
+                    savedPhotoJson);
 
-            if (selectedPhotos is null)
+            if (savedPaths is null)
             {
                 return;
             }
 
-            foreach (var selectedPhoto in selectedPhotos)
+            foreach (string path in savedPaths)
             {
                 if (Photos.Count >= MaximumPhotos)
                 {
                     break;
                 }
 
-                await AddPhotoAsync(selectedPhoto);
+                if (!string.IsNullOrWhiteSpace(path) &&
+                    File.Exists(path))
+                {
+                    Photos.Add(new ProfilePhoto
+                    {
+                        FilePath = path
+                    });
+                }
+            }
+        }
+        catch (JsonException)
+        {
+            LoadLegacyPrimaryPhoto();
+        }
+    }
+
+    private void LoadLegacyPrimaryPhoto()
+    {
+        string primaryPhoto = Preferences.Default.Get(
+            "PrimaryProfilePhoto",
+            string.Empty);
+
+        if (!string.IsNullOrWhiteSpace(primaryPhoto) &&
+            File.Exists(primaryPhoto))
+        {
+            Photos.Add(new ProfilePhoto
+            {
+                FilePath = primaryPhoto
+            });
+        }
+    }
+
+    private async void OnChoosePhotoClicked(
+        object sender,
+        EventArgs e)
+    {
+        if (!CanAddAnotherPhoto())
+        {
+            return;
+        }
+
+        try
+        {
+            FileResult? selectedPhoto =
+                await MediaPicker.Default.PickPhotoAsync(
+                    new MediaPickerOptions
+                    {
+                        Title = "Choose a profile photo"
+                    });
+
+            if (selectedPhoto is null)
+            {
+                return;
             }
 
-            UpdatePhotoCount();
+            await AddPhotoAsync(selectedPhoto);
+        }
+        catch (FeatureNotSupportedException)
+        {
+            await DisplayAlert(
+                "Not Supported",
+                "Photo selection is not supported on this device.",
+                "OK");
         }
         catch (PermissionException)
         {
-            ShowError(
-                "Outty does not have permission to access your photos.");
+            await DisplayAlert(
+                "Permission Required",
+                "Outty needs permission to access your photos.",
+                "OK");
         }
         catch (Exception ex)
         {
-            ShowError(
-                $"Unable to select photos: {ex.Message}");
+            await DisplayAlert(
+                "Photo Error",
+                $"The photo could not be selected: {ex.Message}",
+                "OK");
         }
     }
 
     private async void OnTakePhotoClicked(
-        object? sender,
+        object sender,
         EventArgs e)
     {
-        ClearError();
-
-        if (Photos.Count >= MaximumPhotos)
+        if (!CanAddAnotherPhoto())
         {
-            ShowError(
-                $"You may upload a maximum of {MaximumPhotos} photos.");
-
             return;
         }
 
@@ -93,26 +334,15 @@ public partial class CreateProfilePage : ContentPage
         {
             if (!MediaPicker.Default.IsCaptureSupported)
             {
-                await DisplayAlertAsync(
+                await DisplayAlert(
                     "Camera Unavailable",
-                    "Photo capture is not supported on this device.",
+                    "Photo capture is not supported on this device or emulator.",
                     "OK");
 
                 return;
             }
 
-            var cameraPermission =
-                await Permissions.RequestAsync<Permissions.Camera>();
-
-            if (cameraPermission != PermissionStatus.Granted)
-            {
-                ShowError(
-                    "Camera permission is required to take a photo.");
-
-                return;
-            }
-
-            var capturedPhoto =
+            FileResult? capturedPhoto =
                 await MediaPicker.Default.CapturePhotoAsync(
                     new MediaPickerOptions
                     {
@@ -125,56 +355,85 @@ public partial class CreateProfilePage : ContentPage
             }
 
             await AddPhotoAsync(capturedPhoto);
-            UpdatePhotoCount();
+        }
+        catch (FeatureNotSupportedException)
+        {
+            await DisplayAlert(
+                "Not Supported",
+                "The camera is not supported on this device.",
+                "OK");
         }
         catch (PermissionException)
         {
-            ShowError(
-                "Outty does not have permission to use the camera.");
+            await DisplayAlert(
+                "Permission Required",
+                "Outty needs camera permission to take a photo.",
+                "OK");
         }
         catch (Exception ex)
         {
-            ShowError(
-                $"Unable to take photo: {ex.Message}");
+            await DisplayAlert(
+                "Camera Error",
+                $"The photo could not be captured: {ex.Message}",
+                "OK");
         }
     }
 
-    private async Task AddPhotoAsync(FileResult selectedPhoto)
+    private bool CanAddAnotherPhoto()
     {
-        var fileExtension =
-            Path.GetExtension(selectedPhoto.FileName);
-
-        if (string.IsNullOrWhiteSpace(fileExtension))
+        if (Photos.Count < MaximumPhotos)
         {
-            fileExtension = ".jpg";
+            return true;
         }
 
-        var localFileName =
-            $"profile_{Guid.NewGuid()}{fileExtension}";
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await DisplayAlert(
+                "Photo Limit Reached",
+                $"You can add up to {MaximumPhotos} profile photos.",
+                "OK");
+        });
 
-        var localFilePath =
-            Path.Combine(
-                FileSystem.AppDataDirectory,
-                localFileName);
+        return false;
+    }
 
-        await using var sourceStream =
-            await selectedPhoto.OpenReadAsync();
+    private async Task AddPhotoAsync(FileResult photo)
+    {
+        if (Photos.Count >= MaximumPhotos)
+        {
+            return;
+        }
 
-        await using var localFileStream =
+        string extension = Path.GetExtension(photo.FileName);
+
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        string localFileName =
+            $"profile_{Guid.NewGuid():N}{extension}";
+
+        string localFilePath = Path.Combine(
+            FileSystem.AppDataDirectory,
+            localFileName);
+
+        await using Stream sourceStream =
+            await photo.OpenReadAsync();
+
+        await using FileStream destinationStream =
             File.Create(localFilePath);
 
-        await sourceStream.CopyToAsync(localFileStream);
+        await sourceStream.CopyToAsync(destinationStream);
 
-        Photos.Add(
-            new ProfilePhoto
-            {
-                FileName = selectedPhoto.FileName,
-                FilePath = localFilePath
-            });
+        Photos.Add(new ProfilePhoto
+        {
+            FilePath = localFilePath
+        });
     }
 
-    private void OnRemovePhotoClicked(
-        object? sender,
+    private async void OnRemovePhotoClicked(
+        object sender,
         EventArgs e)
     {
         if (sender is not Button button ||
@@ -183,302 +442,420 @@ public partial class CreateProfilePage : ContentPage
             return;
         }
 
+        bool shouldRemove = await DisplayAlert(
+            "Remove Photo",
+            "Are you sure you want to remove this photo?",
+            "Remove",
+            "Cancel");
+
+        if (!shouldRemove)
+        {
+            return;
+        }
+
         Photos.Remove(photo);
 
+        TryDeleteLocalPhoto(photo.FilePath);
+    }
+
+    private static void TryDeleteLocalPhoto(string filePath)
+    {
         try
         {
-            if (File.Exists(photo.FilePath))
+            if (string.IsNullOrWhiteSpace(filePath) ||
+                !File.Exists(filePath))
             {
-                File.Delete(photo.FilePath);
+                return;
+            }
+
+            string appDataDirectory =
+                Path.GetFullPath(FileSystem.AppDataDirectory);
+
+            string photoPath = Path.GetFullPath(filePath);
+
+            if (photoPath.StartsWith(
+                    appDataDirectory,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                File.Delete(photoPath);
             }
         }
         catch
         {
-            // Keep the app running if the local file cannot be deleted.
+            // Removing the photo from the profile should still succeed
+            // even if the local file cannot be deleted.
         }
-
-        UpdatePhotoCount();
     }
 
-    private void OnBioTextChanged(
-        object? sender,
-        TextChangedEventArgs e)
+    private void OnSearchRadiusChanged(
+        object sender,
+        ValueChangedEventArgs e)
     {
-        BioCountLabel.Text =
-            $"{e.NewTextValue?.Length ?? 0} / 300";
-    }
+        int radius = (int)Math.Round(e.NewValue);
 
-    private void OnBirthDateSelected(
-        object? sender,
-        DateChangedEventArgs e)
-    {
-        UpdateAgeLabel();
-    }
+        radius = Math.Clamp(radius, 5, 100);
 
-    private void UpdateAgeLabel()
-    {
-        var birthDate =
-            BirthDatePicker.Date ?? DateTime.Today;
-
-        var age = CalculateAge(birthDate);
-
-        AgeLabel.Text = age >= 18
-            ? $"Age: {age}"
-            : "You must be at least 18 years old.";
-
-        AgeLabel.TextColor = age >= 18
-            ? Color.FromArgb("#667267")
-            : Color.FromArgb("#B3261E");
+        SearchRadiusLabel.Text =
+            radius == 1
+                ? "1 mile"
+                : $"{radius} miles";
     }
 
     private async void OnSaveProfileClicked(
-        object? sender,
+        object sender,
         EventArgs e)
     {
-        ClearError();
-
-        if (Photos.Count == 0)
+        if (_isSaving)
         {
-            ShowError(
-                "Please add at least one profile photo.");
-
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(NameEntry.Text))
+        try
         {
-            ShowError(
-                "Please enter a display name.");
+            _isSaving = true;
+            SetSavingState(true);
 
-            return;
+            string displayName =
+                DisplayNameEntry.Text?.Trim() ?? string.Empty;
+
+            string bio =
+                BioEditor.Text?.Trim() ?? string.Empty;
+
+            string city =
+                CityEntry.Text?.Trim() ?? string.Empty;
+
+            string state =
+                StatePicker.SelectedItem?.ToString()?.Trim()
+                ?? string.Empty;
+
+            string zipCode =
+                ZipCodeEntry.Text?.Trim() ?? string.Empty;
+
+            DateTime? selectedDateOfBirth =
+                DateOfBirthPicker.Date;
+
+            if (!selectedDateOfBirth.HasValue)
+            {
+                await DisplayAlertAsync(
+                    "Profile Incomplete",
+                    "Please select your date of birth.",
+                    "OK");
+
+                return;
+            }
+
+            DateTime dateOfBirth =
+                selectedDateOfBirth.Value;
+
+            int searchRadius =
+                (int)Math.Round(SearchRadiusSlider.Value);
+
+            List<(string Name, string Level)> selectedInterests =
+                GetSelectedInterestsWithLevels();
+
+            string? validationMessage = ValidateProfile(
+                displayName,
+                bio,
+                city,
+                state,
+                zipCode,
+                dateOfBirth,
+                selectedInterests);
+
+            if (validationMessage is not null)
+            {
+                await DisplayAlert(
+                    "Profile Incomplete",
+                    validationMessage,
+                    "OK");
+
+                return;
+            }
+
+            if (!AllSelectedInterestsHaveLevel())
+            {
+                await DisplayAlert(
+                    "Profile Incomplete",
+                    "Please select an experience level for each checked interest.",
+                    "OK");
+
+                return;
+            }
+
+            int userId = Preferences.Default.Get("UserId", -1);
+
+            if (userId == -1)
+            {
+                await DisplayAlert(
+                    "Not Signed In",
+                    "You must be signed in before creating a profile.",
+                    "OK");
+
+                return;
+            }
+
+            try
+            {
+                var saveResult = await _apiClient.CreateProfileAsync(
+                    BuildCreateProfileRequest(
+                        userId,
+                        displayName,
+                        bio,
+                        city,
+                        state,
+                        zipCode,
+                        dateOfBirth,
+                        searchRadius,
+                        selectedInterests));
+
+                Preferences.Default.Set("ProfileId", saveResult.Id);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert(
+                    "Save Error",
+                    $"Your profile could not be saved to the server: {ex.Message}",
+                    "OK");
+
+                return;
+            }
+
+            SaveProfileToPreferences(
+                displayName,
+                bio,
+                city,
+                state,
+                zipCode,
+                dateOfBirth,
+                searchRadius,
+                selectedInterests);
+
+            await DisplayAlert(
+                "Profile Saved",
+                "Your Outty profile has been saved successfully.",
+                "OK");
+
+            await NavigateAfterSaveAsync();
         }
-
-        var birthDate =
-            BirthDatePicker.Date ?? DateTime.Today;
-
-        if (CalculateAge(birthDate) < 18)
+        catch (Exception ex)
         {
-            ShowError(
-                "You must be at least 18 years old.");
-
-            return;
+            await DisplayAlert(
+                "Save Error",
+                $"Your profile could not be saved: {ex.Message}",
+                "OK");
         }
-
-        if (string.IsNullOrWhiteSpace(LocationEntry.Text))
+        finally
         {
-            ShowError(
-                "Please enter your location.");
-
-            return;
+            _isSaving = false;
+            SetSavingState(false);
         }
-
-        if (string.IsNullOrWhiteSpace(BioEditor.Text))
-        {
-            ShowError(
-                "Please enter a short bio.");
-
-            return;
-        }
-
-        if (ExperiencePicker.SelectedIndex == -1)
-        {
-            ShowError(
-                "Please select an experience level.");
-
-            return;
-        }
-
-        if (DistancePicker.SelectedIndex == -1)
-        {
-            ShowError(
-                "Please select a preferred adventure distance.");
-
-            return;
-        }
-
-        if (!HasSelectedGoal())
-        {
-            ShowError(
-                "Please select what you are looking for.");
-
-            return;
-        }
-
-        if (!HasSelectedInterest())
-        {
-            ShowError(
-                "Please select at least one outdoor interest.");
-
-            return;
-        }
-
-        SaveProfileInformation();
-
-        await DisplayAlertAsync(
-            "Profile Created",
-            $"Your profile has been created with {Photos.Count} photo(s).",
-            "Continue");
-
-        await Shell.Current.GoToAsync("//HomePage");
     }
 
-    private void SaveProfileInformation()
+    private static string? ValidateProfile(
+        string displayName,
+        string bio,
+        string city,
+        string state,
+        string zipCode,
+        DateTime dateOfBirth,
+        IReadOnlyCollection<(string Name, string Level)> interests)
     {
-        Preferences.Default.Set(
-            "ProfileName",
-            NameEntry.Text?.Trim() ?? string.Empty);
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            return "Please enter your display name.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileLocation",
-            LocationEntry.Text?.Trim() ?? string.Empty);
+        if (displayName.Length > 50)
+        {
+            return "Your display name must be 50 characters or fewer.";
+        }
 
-        Preferences.Default.Set(
-            "ProfilePronouns",
-            PronounsPicker.SelectedItem?.ToString()
-            ?? "Not provided");
+        if (!IsAtLeastAge(dateOfBirth, MinimumAge))
+        {
+            return $"You must be at least {MinimumAge} years old to create a profile.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileBio",
-            BioEditor.Text?.Trim() ?? string.Empty);
+        if (bio.Length > 500)
+        {
+            return "Your bio must be 500 characters or fewer.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileExperience",
-            ExperiencePicker.SelectedItem?.ToString()
-            ?? "Not selected");
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            return "Please enter your city.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileDistance",
-            DistancePicker.SelectedItem?.ToString()
-            ?? "Not selected");
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return "Please select your state.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileLookingFor",
-            BuildLookingForText());
+        if (!IsValidZipCode(zipCode))
+        {
+            return "Please enter a valid five-digit ZIP Code.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileInterests",
-            BuildInterestsText());
+        if (interests.Count == 0)
+        {
+            return "Please select at least one outdoor interest.";
+        }
 
-        Preferences.Default.Set(
-            "ProfileBirthDate",
-            (BirthDatePicker.Date ?? DateTime.Today)
-                .ToString("O"));
-
-        Preferences.Default.Set(
-            "PrimaryProfilePhoto",
-            Photos[0].FilePath);
+        return null;
     }
 
-    private string BuildLookingForText()
+    private static bool IsAtLeastAge(
+        DateTime dateOfBirth,
+        int minimumAge)
     {
-        var selections = new List<string>();
+        DateTime today = DateTime.Today;
 
-        if (FriendsCheckBox.IsChecked)
-        {
-            selections.Add("Friends");
-        }
+        int age = today.Year - dateOfBirth.Year;
 
-        if (PartnersCheckBox.IsChecked)
-        {
-            selections.Add("Adventure Partners");
-        }
-
-        if (DatingCheckBox.IsChecked)
-        {
-            selections.Add("Dating");
-        }
-
-        if (GroupsCheckBox.IsChecked)
-        {
-            selections.Add("Group Activities");
-        }
-
-        return string.Join(", ", selections);
-    }
-
-    private string BuildInterestsText()
-    {
-        var selections = new List<string>();
-
-        if (HikingCheckBox.IsChecked)
-        {
-            selections.Add("Hiking");
-        }
-
-        if (CampingCheckBox.IsChecked)
-        {
-            selections.Add("Camping");
-        }
-
-        if (KayakingCheckBox.IsChecked)
-        {
-            selections.Add("Kayaking");
-        }
-
-        if (ClimbingCheckBox.IsChecked)
-        {
-            selections.Add("Rock Climbing");
-        }
-
-        if (CyclingCheckBox.IsChecked)
-        {
-            selections.Add("Cycling");
-        }
-
-        if (TravelCheckBox.IsChecked)
-        {
-            selections.Add("Travel and Road Trips");
-        }
-
-        return string.Join(", ", selections);
-    }
-
-    private bool HasSelectedGoal()
-    {
-        return FriendsCheckBox.IsChecked ||
-               PartnersCheckBox.IsChecked ||
-               DatingCheckBox.IsChecked ||
-               GroupsCheckBox.IsChecked;
-    }
-
-    private bool HasSelectedInterest()
-    {
-        return HikingCheckBox.IsChecked ||
-               CampingCheckBox.IsChecked ||
-               KayakingCheckBox.IsChecked ||
-               ClimbingCheckBox.IsChecked ||
-               CyclingCheckBox.IsChecked ||
-               TravelCheckBox.IsChecked;
-    }
-
-    private static int CalculateAge(DateTime birthDate)
-    {
-        var today = DateTime.Today;
-        var age = today.Year - birthDate.Year;
-
-        if (birthDate.Date > today.AddYears(-age))
+        if (dateOfBirth.Date > today.AddYears(-age))
         {
             age--;
         }
 
-        return age;
+        return age >= minimumAge;
     }
 
-    private void UpdatePhotoCount()
+    private static bool IsValidZipCode(string zipCode)
     {
-        PhotoCountLabel.Text =
-            $"{Photos.Count} / {MaximumPhotos}";
+        return zipCode.Length == 5 &&
+               zipCode.All(char.IsDigit);
     }
 
-    private void ShowError(string message)
+    private static CreateProfileRequest BuildCreateProfileRequest(
+        int userId,
+        string displayName,
+        string bio,
+        string city,
+        string state,
+        string zipCode,
+        DateTime dateOfBirth,
+        int searchRadius,
+        IReadOnlyCollection<(string Name, string Level)> interests)
     {
-        ErrorLabel.Text = message;
-        ErrorLabel.IsVisible = true;
+        List<InterestSelection> interestSelections = interests
+            .Select(interest =>
+                new InterestSelection(interest.Name, interest.Level))
+            .ToList();
+
+        return new CreateProfileRequest(
+            UserId: userId,
+            DisplayName: displayName,
+            BirthDate: DateOnly.FromDateTime(dateOfBirth),
+            City: city,
+            State: state,
+            ZipCode: zipCode,
+            Pronouns: null,
+            Bio: bio,
+            PreferredDistance: string.Empty,
+            SearchRadiusMiles: searchRadius,
+            Interests: interestSelections,
+            Goals: []);
     }
 
-    private void ClearError()
+    private void SaveProfileToPreferences(
+        string displayName,
+        string bio,
+        string city,
+        string state,
+        string zipCode,
+        DateTime dateOfBirth,
+        int searchRadius,
+        IReadOnlyCollection<(string Name, string Level)> interests)
     {
-        ErrorLabel.Text = string.Empty;
-        ErrorLabel.IsVisible = false;
+        Preferences.Default.Set(
+            "ProfileDisplayName",
+            displayName);
+
+        Preferences.Default.Set(
+            "ProfileBio",
+            bio);
+
+        Preferences.Default.Set(
+            "ProfileDateOfBirth",
+            dateOfBirth.ToString("O"));
+
+        Preferences.Default.Set(
+            "ProfileCity",
+            city);
+
+        Preferences.Default.Set(
+            "ProfileState",
+            state);
+
+        Preferences.Default.Set(
+            "ProfileZipCode",
+            zipCode);
+
+        Preferences.Default.Set(
+            "ProfileInterests",
+            string.Join(
+                ",",
+                interests.Select(interest => $"{interest.Name}:{interest.Level}")));
+
+        Preferences.Default.Set(
+            "SearchRadiusMiles",
+            Math.Clamp(searchRadius, 5, 100));
+
+        List<string> photoPaths = Photos
+            .Where(photo =>
+                !string.IsNullOrWhiteSpace(photo.FilePath))
+            .Select(photo => photo.FilePath)
+            .ToList();
+
+        string photoJson =
+            JsonSerializer.Serialize(photoPaths);
+
+        Preferences.Default.Set(
+            "ProfilePhotos",
+            photoJson);
+
+        Preferences.Default.Set(
+            "PrimaryProfilePhoto",
+            photoPaths.FirstOrDefault() ?? string.Empty);
+
+        Preferences.Default.Set(
+            "HasCompletedProfile",
+            true);
     }
+
+    private void SetSavingState(bool isSaving)
+    {
+        SaveProfileButton.IsEnabled = !isSaving;
+        SaveProfileButton.Text =
+            isSaving
+                ? "Saving..."
+                : "Save Profile";
+
+        SavingIndicator.IsVisible = isSaving;
+        SavingIndicator.IsRunning = isSaving;
+    }
+
+    private static async Task NavigateAfterSaveAsync()
+    {
+        try
+        {
+            await Shell.Current.GoToAsync($"///{nameof(HomePage)}");
+        }
+        catch
+        {
+            try
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+            catch
+            {
+                // The profile has still been saved even if navigation
+                // cannot be completed.
+            }
+        }
+    }
+}
+
+public sealed class ProfilePhoto
+{
+    public string FilePath { get; set; } = string.Empty;
 }

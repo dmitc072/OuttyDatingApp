@@ -1,4 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.Windows.AppLifecycle;
+using Windows.ApplicationModel.Activation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -20,5 +22,20 @@ public partial class App : MauiWinUIApplication
 	}
 
 	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+
+	protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+	{
+		base.OnLaunched(args);
+
+		// Completes the Google Sign-In flow when Windows re-activates the app via the
+		// "com.googleusercontent.apps.757401812518" protocol registered in Package.appxmanifest.
+		var activatedEventArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
+
+		if (activatedEventArgs?.Kind == ExtendedActivationKind.Protocol &&
+			activatedEventArgs.Data is IProtocolActivatedEventArgs protocolArgs)
+		{
+			Microsoft.Maui.Authentication.WebAuthenticator.Instance.ResumeAuth(protocolArgs.Uri);
+		}
+	}
 }
 

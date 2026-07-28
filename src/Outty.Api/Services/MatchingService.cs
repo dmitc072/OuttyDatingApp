@@ -1,0 +1,249 @@
+using Microsoft.EntityFrameworkCore;
+using Outty.Api.Data;
+
+namespace Outty.Api.Services;
+
+public record CandidateProfile(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    int SharedInterestCount);
+
+public record SwipeResult(bool IsMatch, int? ConversationId);
+
+public record MatchSummary(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    int ConversationId);
+
+public record LikedProfile(
+    int ProfileId,
+    string DisplayName,
+    string City,
+    string State,
+    bool IsMatch,
+    int? ConversationId);
+
+public class MatchingService(OuttyDbContext db, ConversationService conversationService)
+{
+    public async Task<List<CandidateProfile>> GetCandidatesAsync(int profileId)
+    {
+        var requester = await db.Profiles
+            .Include(p => p.ProfileInterests)
+            .FirstOrDefaultAsync(p => p.Id == profileId);
+
+        if (requester is null)
+        {
+            return [];
+        }
+
+        var requesterInterestIds = requester.ProfileInterests
+            .Select(pi => pi.InterestId)
+            .ToHashSet();
+
+        var alreadySwipedProfileIds = await db.Swipes
+            .Where(s => s.SwiperProfileId == profileId)
+            .Select(s => s.TargetProfileId)
+            .ToListAsync();
+
+        var candidates = await db.Profiles
+            .Include(p => p.ProfileInterests)
+            .Where(p =>
+                p.Id != profileId &&
+                p.State == requester.State &&
+                !alreadySwipedProfileIds.Contains(p.Id))
+            .ToListAsync();
+
+        return candidates
+            .Select(c => new CandidateProfile(
+                c.Id,
+                c.DisplayName,
+                c.City,
+                c.State,
+                c.ProfileInterests.Count(pi => requesterInterestIds.Contains(pi.InterestId))))
+            .Where(c => c.SharedInterestCount > 0)
+            .OrderByDescending(c => c.SharedInterestCount)
+            .ThenBy(c => c.DisplayName)
+            .ToList();
+    }
+
+    public async Task<List<MatchSummary>> GetMatchesAsync(int profileId)
+    {
+        var myProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == profileId);
+
+        if (myProfile is null)
+        {
+            return [];
+        }
+
+        var likedProfileIds = await db.Swipes
+            .Where(s => s.SwiperProfileId == profileId && s.Liked)
+            .Select(s => s.TargetProfileId)
+            .ToListAsync();
+
+        if (likedProfileIds.Count == 0)
+        {
+            return [];
+        }
+
+        var matchedProfileIds = await db.Swipes
+            .Where(s =>
+                s.TargetProfileId == profileId &&
+                s.Liked &&
+                likedProfileIds.Contains(s.SwiperProfileId))
+            .Select(s => s.SwiperProfileId)
+            .ToListAsync();
+
+        if (matchedProfileIds.Count == 0)
+        {
+            return [];
+        }
+
+        var matchedProfiles = await db.Profiles
+            .Where(p => matchedProfileIds.Contains(p.Id))
+            .ToListAsync();
+
+        var matches = new List<MatchSummary>();
+
+        foreach (var matchedProfile in matchedProfiles)
+        {
+            var conversation = await conversationService.FindOrCreateConversationAsync(
+                myProfile.UserId, matchedProfile.UserId);
+
+            if (conversation is null)
+            {
+                continue;
+            }
+
+            matches.Add(new MatchSummary(
+                matchedProfile.Id,
+                matchedProfile.DisplayName,
+                matchedProfile.City,
+                matchedProfile.State,
+                conversation.ConversationId));
+        }
+
+        return matches.OrderBy(m => m.DisplayName).ToList();
+    }
+
+    public async Task<List<LikedProfile>> GetLikedProfilesAsync(int profileId)
+    {
+        var myProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == profileId);
+
+        if (myProfile is null)
+        {
+            return [];
+        }
+
+        var likedProfileIds = await db.Swipes
+            .Where(s => s.SwiperProfileId == profileId && s.Liked)
+            .Select(s => s.TargetProfileId)
+            .ToListAsync();
+
+        if (likedProfileIds.Count == 0)
+        {
+            return [];
+        }
+
+        var reciprocalProfileIds = await db.Swipes
+            .Where(s =>
+                s.TargetProfileId == profileId &&
+                s.Liked &&
+                likedProfileIds.Contains(s.SwiperProfileId))
+            .Select(s => s.SwiperProfileId)
+            .ToHashSetAsync();
+
+        var likedProfiles = await db.Profiles
+            .Where(p => likedProfileIds.Contains(p.Id))
+            .ToListAsync();
+
+        var results = new List<LikedProfile>();
+
+        foreach (var likedProfile in likedProfiles)
+        {
+            var isMatch = reciprocalProfileIds.Contains(likedProfile.Id);
+            int? conversationId = null;
+
+            if (isMatch)
+            {
+                var conversation = await conversationService.FindOrCreateConversationAsync(
+                    myProfile.UserId, likedProfile.UserId);
+
+                conversationId = conversation?.ConversationId;
+            }
+
+            results.Add(new LikedProfile(
+                likedProfile.Id,
+                likedProfile.DisplayName,
+                likedProfile.City,
+                likedProfile.State,
+                isMatch,
+                conversationId));
+        }
+
+        return results
+            .OrderByDescending(r => r.IsMatch)
+            .ThenBy(r => r.DisplayName)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Records a like/pass from one profile toward another. If it's a like and the
+    /// target had already liked the swiper back, this is a mutual match.
+    /// </summary>
+    public async Task<SwipeResult?> RecordSwipeAsync(int swiperProfileId, int targetProfileId, bool liked)
+    {
+        if (swiperProfileId == targetProfileId)
+        {
+            return null;
+        }
+
+        var swiperProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == swiperProfileId);
+        var targetProfile = await db.Profiles.FirstOrDefaultAsync(p => p.Id == targetProfileId);
+
+        if (swiperProfile is null || targetProfile is null)
+        {
+            return null;
+        }
+
+        var existingSwipe = await db.Swipes.FirstOrDefaultAsync(s =>
+            s.SwiperProfileId == swiperProfileId && s.TargetProfileId == targetProfileId);
+
+        if (existingSwipe is null)
+        {
+            db.Swipes.Add(new Swipe
+            {
+                SwiperProfileId = swiperProfileId,
+                TargetProfileId = targetProfileId,
+                Liked = liked,
+                CreatedAtUtc = DateTime.UtcNow
+            });
+        }
+        else
+        {
+            existingSwipe.Liked = liked;
+        }
+
+        await db.SaveChangesAsync();
+
+        var isMatch = liked && await db.Swipes.AnyAsync(s =>
+            s.SwiperProfileId == targetProfileId &&
+            s.TargetProfileId == swiperProfileId &&
+            s.Liked);
+
+        int? conversationId = null;
+
+        if (isMatch)
+        {
+            var conversation = await conversationService.FindOrCreateConversationAsync(
+                swiperProfile.UserId, targetProfile.UserId);
+
+            conversationId = conversation?.ConversationId;
+        }
+
+        return new SwipeResult(isMatch, conversationId);
+    }
+}

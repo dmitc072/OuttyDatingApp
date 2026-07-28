@@ -135,17 +135,6 @@
                         TextColor="#183D2B" />
 
                     <Label
-                        Text="Experience Level"
-                        TextColor="#667267" />
-
-                    <Label
-                        x:Name="ExperienceLabel"
-                        FontAttributes="Bold"
-                        Text="Not selected"
-                        TextColor="#222222" />
-
-                    <Label
-                        Margin="0,8,0,0"
                         Text="Preferred Distance"
                         TextColor="#667267" />
 

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="Outty.Mobile.Views.ChatPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:messaging="clr-namespace:Outty.Shared.Models.Messaging;assembly=Outty.Shared"
+    Title="{Binding OtherUserName}">
+
+    <Grid
+        Padding="12"
+        RowDefinitions="*,Auto"
+        RowSpacing="10">
+
+        <!-- Message list -->
+        <RefreshView
+            Grid.Row="0"
+            Command="{Binding RefreshCommand}"
+            IsRefreshing="{Binding IsRefreshing}">
+
+            <CollectionView
+                x:Name="MessagesCollectionView"
+                EmptyView="No messages yet. Start the conversation!"
+                ItemsSource="{Binding Messages}"
+                SelectionMode="None">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="messaging:MessageDto">
+
+                        <Border
+                            Margin="0,4"
+                            Padding="12"
+                            HorizontalOptions="Start"
+                            MaximumWidthRequest="420"
+                            StrokeShape="RoundRectangle 16"
+                            StrokeThickness="0">
+
+                            <Border.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding SenderId}"
+                                    TargetType="Border"
+                                    Value="1">
+
+                                    <Setter
+                                        Property="HorizontalOptions"
+                                        Value="End" />
+
+                                    <Setter
+                                        Property="BackgroundColor"
+                                        Value="#512BD4" />
+                                </DataTrigger>
+
+                                <DataTrigger
+                                    Binding="{Binding SenderId}"
+                                    TargetType="Border"
+                                    Value="0">
+
+                                    <Setter
+                                        Property="BackgroundColor"
+                                        Value="#EAEAEA" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
+                            <VerticalStackLayout Spacing="4">
+
+                                <Label
+                                    FontSize="16"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding Content}">
+
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding SenderId}"
+                                            TargetType="Label"
+                                            Value="1">
+
+                                            <Setter
+                                                Property="TextColor"
+                                                Value="White" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                                <Label
+                                    FontSize="11"
+                                    HorizontalOptions="End"
+                                    Text="{Binding SentAtUtc, StringFormat='{0:h:mm tt}'}"
+                                    TextColor="Gray">
+
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding SenderId}"
+                                            TargetType="Label"
+                                            Value="1">
+
+                                            <Setter
+                                                Property="TextColor"
+                                                Value="#E0D8FF" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Message entry area -->
+        <Border
+            Grid.Row="1"
+            Padding="10"
+            BackgroundColor="#F5F5F5"
+            Stroke="#D9D9D9"
+            StrokeShape="RoundRectangle 18">
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+
+                <Editor
+                    x:Name="MessageEditor"
+                    Grid.Column="0"
+                    AutoSize="TextChanges"
+                    MaximumHeightRequest="120"
+                    Placeholder="Type a message..."
+                    Text="{Binding NewMessageText}" />
+
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding SendMessageCommand}"
+                    IsEnabled="{Binding CanSendMessage}"
+                    Text="Send"
+                    VerticalOptions="End" />
+
+            </Grid>
+        </Border>
+
+        <!-- Loading indicator -->
+        <ActivityIndicator
+            Grid.RowSpan="2"
+            HorizontalOptions="Center"
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            VerticalOptions="Center" />
+
+    </Grid>
+</ContentPage>

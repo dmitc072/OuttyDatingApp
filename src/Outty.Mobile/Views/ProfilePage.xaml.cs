@@ -22,9 +22,7 @@ public partial class ProfilePage : ContentPage
                 "Outty User");
 
         ProfileLocationLabel.Text =
-            Preferences.Default.Get(
-                "ProfileLocation",
-                "Location not added");
+            BuildLocationText();
 
         ProfilePronounsLabel.Text =
             Preferences.Default.Get(
@@ -35,11 +33,6 @@ public partial class ProfilePage : ContentPage
             Preferences.Default.Get(
                 "ProfileBio",
                 "No bio has been added yet.");
-
-        ExperienceLabel.Text =
-            Preferences.Default.Get(
-                "ProfileExperience",
-                "Not selected");
 
         DistanceLabel.Text =
             Preferences.Default.Get(
@@ -52,9 +45,7 @@ public partial class ProfilePage : ContentPage
                 "Not selected");
 
         InterestsLabel.Text =
-            Preferences.Default.Get(
-                "ProfileInterests",
-                "No interests selected.");
+            BuildInterestsText();
 
         var primaryPhotoPath =
             Preferences.Default.Get(
@@ -76,6 +67,52 @@ public partial class ProfilePage : ContentPage
         }
     }
 
+    private string BuildLocationText()
+    {
+        var city = Preferences.Default.Get("ProfileCity", string.Empty);
+        var state = Preferences.Default.Get("ProfileState", string.Empty);
+
+        if (string.IsNullOrWhiteSpace(city) && string.IsNullOrWhiteSpace(state))
+        {
+            return "Location not added";
+        }
+
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return city;
+        }
+
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            return state;
+        }
+
+        return $"{city}, {state}";
+    }
+
+    private string BuildInterestsText()
+    {
+        var saved = Preferences.Default.Get("ProfileInterests", string.Empty);
+
+        if (string.IsNullOrWhiteSpace(saved))
+        {
+            return "No interests selected.";
+        }
+
+        // Stored as "Name:Level" pairs, e.g. "Hiking:Advance,Camping:Beginner".
+        var formatted = saved
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(entry =>
+            {
+                var parts = entry.Split(':', 2);
+                return parts.Length == 2
+                    ? $"{parts[0]} ({parts[1]})"
+                    : parts[0];
+            });
+
+        return string.Join(", ", formatted);
+    }
+
     private async void OnEditProfileClicked(
         object? sender,
         EventArgs e)
@@ -83,7 +120,7 @@ public partial class ProfilePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                "//CreateProfilePage");
+                nameof(CreateProfilePage));
         }
         catch (Exception ex)
         {
@@ -101,7 +138,7 @@ public partial class ProfilePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                "//SettingsPage");
+                nameof(SettingsPage));
         }
         catch (Exception ex)
         {
@@ -119,7 +156,7 @@ public partial class ProfilePage : ContentPage
         try
         {
             await Shell.Current.GoToAsync(
-                "//HomePage");
+                $"///{nameof(HomePage)}");
         }
         catch (Exception ex)
         {

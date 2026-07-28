@@ -1,8 +1,7 @@
 # Sprint 2 — Sprint Review
 
-**Date:** [Date]
-**Duration:** 30 minutes
-**Attendees:** Duane Mitchell (SM), [Member 2] (PO), [Member 3] (Dev)
+**Date:** July 19, 2026
+**Prepared by:** Duane Mitchell (Scrum Master)
 
 ---
 
@@ -10,56 +9,57 @@
 
 **Sprint Goal:** Deliver a working matching engine where users can set their search radius, swipe on filtered profiles, match with users who swipe back, and receive a match notification.
 
-**Goal Met:** ✅ Yes / ❌ No
+**Goal Met:** ❌ No
 
 ---
 
 ## Stories Completed
 
-| ID | Story | Points | Status |
-|---|---|---|---|
-| US-08 | Set Search Radius | 2 | ✅ Done |
-| US-09 | Set Availability | 2 | ✅ Done |
-| US-10 | Swipe Left/Right UI | 5 | ✅ Done |
-| US-11 | Matching Algorithm | 5 | ✅ Done |
-| US-12 | Match Notification | 3 | ✅ Done |
-| **Total** | | **17 pts** | |
+### Sprint 2 Committed Stories
+
+| ID        | Story               | Points     | Status      |
+| --------- | ------------------- | ---------- | ----------- |
+| US-08     | Set Search Radius   | 2          | Not Started |
+| US-09     | Set Availability    | 2          | Not Started |
+| US-10     | Swipe Left/Right UI | 5          | In Progress |
+| US-11     | Matching Algorithm  | 5          | In Progress |
+| US-12     | Set up Database      | 3          | ✅ Done     |
+| **Total** |                     | **17 pts** | **3 pts done** |
+
+### Carried Over from Sprint 1 (completed this week)
+
+| ID        | Story                       | Points     | Status  |
+| --------- | ---------------------------- | ---------- | ------- |
+| US-01     | Google SSO Login             | 5          | ✅ Done |
+| US-02     | Create Profile                | 3          | ✅ Done |
+| US-03     | Upload/Update Profile Photo   | 3          | ✅ Done |
+| US-04     | Delete Account                | 2          | ✅ Done |
+| **Total** |                               | **13 pts** | **13 pts done** |
 
 ---
 
 ## Demo Notes
 
-**US-10 + US-11 — Swipe + Matching:**
-- Opened SwipePage — profile cards loaded from API (filtered by shared activity + distance)
-- Swiped right on a candidate — card animated off screen, like recorded in Azure SQL
-- Swiped left on another — card animated off screen, pass recorded
-
-**US-12 — Match Notification:**
-- Two test accounts mutually liked each other
-- Match alert popup appeared on screen immediately
-- Matched user appeared in Matches list
-
-**CI Pipeline:**
-- Showed GitHub Actions tab — green checkmarks on last 5 commits
-- Demonstrated that pushing a failing test causes the CI to go red
+- Demonstrated the completed database setup and connectivity (US-12).
+- Verified successful storage and retrieval of application data.
+- Also demoed Google SSO Login, Create Profile, Upload/Update Profile Photo, and Delete Account (US-01–US-04), carried over from Sprint 1 and finished this week.
+- Remaining Sprint 2 matching-engine features (US-08–US-11) were still under development and will continue in the next sprint.
 
 ---
 
 ## Working Software
 
-**Link:** [Azure App Service URL or Loom screen recording link]
-
-![Swipe Screen](../assets/sprint2-demo-swipe.png)
-![Match Notification](../assets/sprint2-demo-match.png)
+**Link:** https://youtu.be/Uvse9UbsL84
 
 ---
 
 ## Actual Velocity
 
-**Planned:** 17 story points
-**Completed:** [X] story points
+**Sprint 2 committed:** 17 story points → 3 pts completed (US-12)
+**Sprint 1 carryover completed this sprint:** 13 story points (US-01, US-02, US-03, US-04)
+**Total completed this sprint:** 16 story points
 
-> Used for Sprint 3 Yesterday's Weather forecast.
+> Used for Sprint 3 Yesterday's Weather forecast — total velocity counts everything actually shipped this sprint, regardless of which sprint originally planned it.
 
 ---
 
@@ -67,44 +67,42 @@
 
 # Sprint 2 — Retrospective
 
-**Date:** [Date]
-**Duration:** 20 minutes
-**Facilitator:** Duane Mitchell
+**Date:** July 19, 2026
+**Prepared by:** Duane Mitchell (Scrum Master)
 
 ---
 
 ## What Went Well (Continue)
 
-- **CI saved us twice** — GitHub Actions caught a breaking test before it merged to main on Day 5 and Day 8. Without CI we would have discovered these bugs much later
-- **Planned pairing sessions worked better than reactive ones** — scheduling them at planning meant they actually happened. Sprint 1 pairing felt rushed
-- **Yesterday's Weather was accurate** — our Sprint 1 actual velocity was a reliable predictor. We finished on track without needing to descope
+- Successfully completed the database setup.
+- Established a solid backend foundation for future development.
 
 ---
 
 ## What Didn't Go Well (Stop)
 
-- **Swipe animation took longer than estimated** — PanGestureRecognizer edge cases (diagonal swipes, slow swipes) took an extra day. Should have spiked this in Sprint 1
-- **API tests still only running locally** — CD is not set up yet, so the instructor cannot hit a live URL without us running the server. Need to fix this in Sprint 3
+- Most planned user stories were not completed and will need to be carried into the next sprint.
+- Photo upload functionality was not fully supported in the Android emulator, although it worked correctly in the Windows application.
 
 ---
 
 ## What To Do Differently (Start)
 
-- **Sprint 3: Set up CD to Azure App Service** — commit to having a live URL by Sprint 3 Day 3
-- **Sprint 3: Spike any new UI interaction in the first 2 days** — don't let animation or gesture work block story completion in the back half of the sprint
+- Complete the remaining Sprint 2 user stories before adding new functionality.
+- Expand automated test coverage for the application and backend.
 
 ---
 
 ## Action Items
 
-| Action | Owner | By When |
-|---|---|---|
-| Set up CD workflow in GitHub Actions | [Member 2] | Sprint 3 Day 3 |
-| Spike SignalR real-time connection in Day 1-2 | [Member 3] | Sprint 3 Day 2 |
-| Update README with live Azure URL | Duane | Sprint 3 Day 4 |
+| Action                    | Owner   | By When  |
+| ------------------------- | ------- | -------- |
+| Expand automated testing  | Duane   | Sprint 3 |
+| Improve matching features | Duane   | Sprint 3 |
+| Enhance user interface    | Jazmine | Sprint 3 |
 
 ---
 
 ## Actual Velocity for Yesterday's Weather (Sprint 3)
 
-**Sprint 2 completed:** [X] story points → this becomes Sprint 3 forecast
+**Sprint 2 completed:** 16 story points → this becomes Sprint 3 forecast

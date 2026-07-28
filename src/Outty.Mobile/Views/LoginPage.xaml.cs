@@ -1,10 +1,18 @@
+using Outty.Mobile.Services;
+
 namespace Outty.Mobile.Views;
 
 public partial class LoginPage : ContentPage
 {
-    public LoginPage()
+    private readonly GoogleAuthService _googleAuthService;
+    private readonly ApiClient _apiClient;
+
+    public LoginPage(GoogleAuthService googleAuthService, ApiClient apiClient)
     {
         InitializeComponent();
+
+        _googleAuthService = googleAuthService;
+        _apiClient = apiClient;
     }
 
     private async void OnGoogleLoginClicked(
@@ -15,9 +23,17 @@ public partial class LoginPage : ContentPage
         {
             SetLoadingState(true);
 
-            // Simulated Google Sign-In for the class project.
+            var idToken = await _googleAuthService.SignInAndGetIdTokenAsync();
+
+            var loginResult = await _apiClient.LoginWithGoogleAsync(idToken);
+
+            Preferences.Default.Set("UserId", loginResult.UserId);
+            Preferences.Default.Set("UserEmail", loginResult.Email);
+
             await Shell.Current.GoToAsync(
-                nameof(CreateProfilePage));
+                loginResult.HasProfile
+                    ? $"///{nameof(HomePage)}"
+                    : nameof(CreateProfilePage));
         }
         catch (Exception ex)
         {

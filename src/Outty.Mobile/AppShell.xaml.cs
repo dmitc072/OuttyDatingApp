@@ -1,10 +1,11 @@
-﻿using Outty.Mobile.Views;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Outty.Mobile.Views;
 
 namespace Outty.Mobile;
 
 public partial class AppShell : Shell
 {
-    public AppShell()
+    public AppShell(IServiceProvider serviceProvider)
     {
         InitializeComponent();
 
@@ -13,15 +14,27 @@ public partial class AppShell : Shell
             typeof(CreateProfilePage));
 
         Routing.RegisterRoute(
-            nameof(ProfilePage),
-            typeof(ProfilePage));
-
-        Routing.RegisterRoute(
             nameof(SettingsPage),
             typeof(SettingsPage));
 
         Routing.RegisterRoute(
             nameof(DeleteAccountPage),
             typeof(DeleteAccountPage));
+
+        Routing.RegisterRoute(
+            nameof(ChatPage),
+            typeof(ChatPage));
+
+        Routing.RegisterRoute(
+            nameof(MatchesPage),
+            typeof(MatchesPage));
+
+        Routing.RegisterRoute(
+            nameof(LikedPage),
+            typeof(LikedPage));
+
+        MessagesShellContent.ContentTemplate =
+            new DataTemplate(() =>
+                serviceProvider.GetRequiredService<ConversationsPage>());
     }
 }
